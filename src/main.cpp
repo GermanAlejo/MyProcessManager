@@ -1,16 +1,13 @@
 #include <iostream>
-#include <fstream>
+#include "../include/process.h"
 
 int main() {
     //Testing
-    std::ifstream pidFile("/proc/1/stat");
-    std::string line;
-    if (pidFile.is_open()) {
-        while (getline(pidFile, line)) {
-            std::cout << line << "\n";
-        }
-    } else std::cout << "Unable to open file";
-    pidFile.close();
+    Process newProcessTest ("/proc/1/stat");
+    Process newProcessTest2 ("/proc/5007/stat");
+
+    newProcessTest.print();
+    newProcessTest2.print();
 
     return 0;
 }

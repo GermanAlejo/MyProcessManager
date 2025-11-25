@@ -16,7 +16,8 @@ add_library(process ${PROCESS_SRC})
 target_include_directories(process PUBLIC include)
 
 # Main executable
-add_executable(MyProcessManager src/main.cpp)
+add_executable(MyProcessManager src/main.cpp
+        include/common.h)
 target_link_libraries(MyProcessManager PRIVATE process)
 
 

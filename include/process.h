@@ -6,12 +6,11 @@
 #ifndef MYPROCESSMANAGER_PROCESS_H
 #define MYPROCESSMANAGER_PROCESS_H
 
-#include <string>;
-#include <fstream>;
+#include <common.h>
 
 class Process {
 private:
-    pid_t pid;
+    int pid;
     std::string name;
 
     void readStatFile(const std::string& pidFileName);
