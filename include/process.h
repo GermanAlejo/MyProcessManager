@@ -8,19 +8,27 @@
 
 #include <common.h>
 
+using namespace std;
+
 class Process {
 private:
-    int pid;
-    std::string name;
+    int pid{};
+    string fullProcessPath;
+    string name;
 
-    void readStatFile(const std::string& pidFileName);
+    void readStatFile(const std::string& processName);
 
 public:
-    Process(const std::string& filePath);
-    Process(const int &pid, const std::string &name);
+    Process(const string& processName);
 
-    void refresh();
-    void print();
+    void refresh(string &pidFileName);
+    void print() const;
+    int getPid() const;
+    string getName();
+    string getFullProcessPath();
+    void setPid(const int &pid);
+    void setName(const string &name);
+    void setFullProcessPath(const string &path);
 };
 
 #endif //MYPROCESSMANAGER_PROCESS_H

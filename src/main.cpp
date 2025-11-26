@@ -3,8 +3,8 @@
 
 int main() {
     //Testing
-    Process newProcessTest ("/proc/1/stat");
-    Process newProcessTest2 ("/proc/5007/stat");
+    Process newProcessTest ("1");
+    Process newProcessTest2 ("5007");
 
     newProcessTest.print();
     newProcessTest2.print();

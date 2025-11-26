@@ -7,16 +7,18 @@
 using namespace std;
 
 //Constructors
-Process::Process(const std::string &filePath) {
-    readStatFile(filePath);
-}
-
-Process::Process(const int &pid, const std::string &name) : pid(pid), name(name) {
+Process::Process(const string &processName) {
+    readStatFile(processName);
 }
 
 //Private methods
-void Process::readStatFile(const std::string &pidFileName) {
-    ifstream pidFile(pidFileName);
+void Process::readStatFile(const string &processName) {
+    //Check error
+    if (!replace(this->fullProcessPath ,processName)) {
+        perror("Error searching for file");
+        exit(EXIT_FAILURE);
+    }
+    ifstream pidFile(fullProcessPath);
     string line;
     vector<string> elemVector;
     if (!pidFile.is_open()) {
@@ -38,9 +40,29 @@ void Process::readStatFile(const std::string &pidFileName) {
 }
 
 //public methods
-void Process::refresh() {
+void Process::refresh(string &pidFileName) {
+    readStatFile(pidFileName);
 }
 
-void Process::print() {
+void Process::print() const {
     cout << "PID: " << pid << "-NAME: " << name << "\n";
 }
+
+//getters & setters
+int Process::getPid() const {
+    return this->pid;
+}
+
+void Process::setPid(const int &pid) {
+    this->pid = pid;
+}
+
+string Process::getName() {
+    return this->name;
+}
+
+void Process::setName(const string &name) {
+    this->name = name;
+}
+
+
