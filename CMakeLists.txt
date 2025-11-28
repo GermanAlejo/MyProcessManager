@@ -17,7 +17,9 @@ target_include_directories(process PUBLIC include)
 
 # Main executable
 add_executable(MyProcessManager src/main.cpp
-        include/common.h)
+        src/errors.cpp
+)
+
 target_link_libraries(MyProcessManager PRIVATE process)
 
 

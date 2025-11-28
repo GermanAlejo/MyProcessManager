@@ -6,6 +6,7 @@
 #ifndef MYPROCESSMANAGER_PROCESS_H
 #define MYPROCESSMANAGER_PROCESS_H
 
+#include <map>
 #include <common.h>
 
 using namespace std;
@@ -16,7 +17,8 @@ private:
     string fullProcessPath;
     string name;
 
-    void readStatFile(const std::string& processName);
+    void readStatFile(const string& processName);
+    map<string, string> parseStatFile(const string& fileLine);
 
 public:
     Process(const string& processName);

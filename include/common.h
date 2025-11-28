@@ -12,6 +12,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include "errors.h"
 
 inline constexpr char processPath[] = "/proc/*/stat";
 inline constexpr std::string processFinderChar = "*";
