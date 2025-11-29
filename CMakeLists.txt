@@ -10,16 +10,17 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Source grouping
 file(GLOB_RECURSE PROCESS_SRC "src/process.cpp")
+file(GLOB_RECURSE ERROR_SRC "src/errors.cpp")
 
 # Include folder (root include path)
 add_library(process ${PROCESS_SRC})
 target_include_directories(process PUBLIC include)
 
-# Main executable
-add_executable(MyProcessManager src/main.cpp
-        src/errors.cpp
-)
+add_library(errors ${ERROR_SRC})
+target_include_directories(errors PUBLIC include)
 
-target_link_libraries(MyProcessManager PRIVATE process)
+# Main executable
+add_executable(MyProcessManager src/main.cpp)
+target_link_libraries(MyProcessManager PRIVATE process errors)
 
 

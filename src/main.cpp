@@ -1,6 +1,8 @@
 #include <iostream>
 #include "../include/process.h"
 
+using namespace myProc;
+
 int main() {
     //Testing
     Process newProcessTest ("1");
