@@ -17,6 +17,7 @@
 namespace myProc::commonLib {
     inline constexpr char processPath[] = "/proc/*/stat";
     inline constexpr std::string processFinderChar = "*";
+    inline constexpr char processPathStatus[] ="/proc/*/status";
 
     enum state {
         R = 'R',//Running

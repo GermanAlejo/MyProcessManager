@@ -72,6 +72,44 @@ namespace myProc {
         return processesMap;
     }
 
+    void Process::readStatusFile(const string &processName) {
+        try {
+            //Check error
+            if (!commonLib::replace(this->fullProcessPath, processName)) {
+                perror("Error searching for file");
+                throw ProcessReadError("Failed reading /proc/ for pid: " + processName);
+            }
+
+            ifstream pidFile(fullProcessPath);
+            string line;
+            vector<string> elemVector;
+            if (!pidFile.is_open()) {
+                perror("Error reading file");
+                throw ProcessFileError("Error opening file");
+            }
+            //get line and loop with spaces
+            getline(pidFile, line);
+            map<string, string> processMap = parseStatFile(line);
+
+            //TODO: Change this to const and automate it
+            this->name = processMap.at("Name");
+            //string to int
+            this->pid = stoi(processMap.at("Pos-1"));
+            //TODO: Change how to cast string maybe to explicit cast
+            this->state = commonLib::getStateString(processMap.at("Pos-2")[0]);
+
+            pidFile.close();
+        } catch (ProcessError &e) {
+            std::cerr << "Process error: " << e.what() << "\n";
+            throw ProcessError("Process error");//TODO: maybe this should be change to capture all possiblea exceptions
+        }
+    }
+
+    map<string, string> Process::parseStatusFile(const string &fileLine) {
+
+    }
+
+
     //public methods
     void Process::refresh(string &pidFileName) {
         readStatFile(pidFileName);
@@ -104,5 +142,27 @@ namespace myProc {
 
     void Process::setState(const string& state) {
         this->state = state;
+    }
+
+    string Process::getsTime() {
+        return this->stime;
+    }
+
+    void Process::setStime(const string& stime) {
+        this->stime = stime;
+    }
+    string Process::getUtime() {
+        return this->utime;
+    }
+
+    void Process::setUtime(const string& utime) {
+        this->utime = utime;
+    }
+    string Process::getStartTime() {
+        return this->startTime;
+    }
+
+    void Process::setStartTime(const string& startTime) {
+        this->startTime = startTime;
     }
 }

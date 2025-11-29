@@ -24,6 +24,8 @@ namespace myProc {
 
         void readStatFile(const string& processName);
         static map<string, string> parseStatFile(const string& fileLine);
+        void readStatusFile(const string& processName);
+        static map<string, string> parseStatusFile(const string& fileLine);
 
     public:
         Process(const string& processName);
