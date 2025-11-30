@@ -9,7 +9,6 @@ int main() {
     //Process newProcessTest2 ("5007");
 
     newProcessTest.print();
-    //newProcessTest2.print();
 
     return 0;
 }

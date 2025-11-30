@@ -6,46 +6,50 @@
 #ifndef MYPROCESSMANAGER_PROCESS_H
 #define MYPROCESSMANAGER_PROCESS_H
 
-#include <map>
-#include <common.h>
+#include <unordered_map>
 
 using namespace std;
 
 namespace myProc {
     class Process {
     private:
-        int pid{};
-        string fullProcessPath;
+        string pid {};
+        //values from stat
         string name;
         string state;
         string utime;//time scheduled in user mode
         string stime;//time scheduled in kernel mode
         string startTime;//time process started after boot
+        //values from status
+        string VmRSS; //resident memory
+        string VmSize; //virtual memory
 
-        void readStatFile(const string& processName);
-        static map<string, string> parseStatFile(const string& fileLine);
-        void readStatusFile(const string& processName);
-        static map<string, string> parseStatusFile(const string& fileLine);
+        void readStatFile(const string& processNumber);
+        unordered_map<string, string> parseStatFile(const string& fileLine);
+        void readStatusFile(const string& processNumber);
+        static unordered_map<string, string> parseStatusFile(ifstream& file);
 
     public:
         Process(const string& processName);
-        void refresh(string &pidFileName);
+        void refresh(const string &pidFileName);
         void print() const;
         //getters & setters
-        int getPid() const;
+        string getPid() const;
         string getName();
-        string getFullProcessPath();
         string getState();
         string getUtime();
         string getsTime();
         string getStartTime();
-        void setPid(const int &pid);
+        string getVmRSS();
+        string getVmSize();
+        void setPid(const string &pid);
         void setName(const string &name);
-        void setFullProcessPath(const string &path);
         void setState(const string& state);
         void setUtime(const string& utime);
         void setStime(const string& stime);
         void setStartTime(const string& startTime);
+        void setVmRSS(const string& vmRss);
+        void setVmSize(const string& VmSize);
     };
 }
 
