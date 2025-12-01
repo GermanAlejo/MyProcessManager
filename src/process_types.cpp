@@ -19,6 +19,12 @@ namespace myProc::types {
         //add more fields here
     };
 
+    const StatusFieldData STATUS_FIELDS[] = {
+        {"VmRSS", [](Process &p, const string &val) {p.setVmRSS(val);}},
+        {"VmSize", [](Process &p, const string &val) {p.setVmSize(val);}},
+    };
+
     const size_t FIELD_COUNT = sizeof(FIELDS) / sizeof(FieldData);
+    const size_t STATUS_FIELD_COUNT = sizeof(STATUS_FIELDS) / sizeof(FieldData);
 
 }

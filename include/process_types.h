@@ -20,9 +20,16 @@ namespace myProc::types {
         std::function<void(Process &, const std::string &)> setter;
     };
 
+    struct StatusFieldData {
+        std::string name;
+        std::function<void(Process &, const std::string &)> setter;
+    };
+
     extern const FieldData FIELDS[];
+    extern const StatusFieldData STATUS_FIELDS[];
 
     extern const size_t FIELD_COUNT;
+    extern const size_t STATUS_FIELD_COUNT;
 
 }
 #endif //MYPROCESSMANAGER_PROCESS_TYPES_H

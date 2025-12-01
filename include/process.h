@@ -8,48 +8,46 @@
 
 #include <unordered_map>
 
-using namespace std;
-
 namespace myProc {
     class Process {
     private:
-        string pid {};
+        std::string pid {};
         //values from stat
-        string name;
-        string state;
-        string utime;//time scheduled in user mode
-        string stime;//time scheduled in kernel mode
-        string startTime;//time process started after boot
+        std::string name;
+        std::string state;
+        std::string utime;//time scheduled in user mode
+        std::string stime;//time scheduled in kernel mode
+        std::string startTime;//time process started after boot
         //values from status
-        string VmRSS; //resident memory
-        string VmSize; //virtual memory
+        std::string VmRSS; //resident memory
+        std::string VmSize; //virtual memory
 
-        void readStatFile(const string& processNumber);
-        unordered_map<string, string> parseStatFile(const string& fileLine);
-        void readStatusFile(const string& processNumber);
-        static unordered_map<string, string> parseStatusFile(ifstream& file);
+        void readStatFile(const std::string& processNumber);
+        std::unordered_map<std::string, std::string> parseStatFile(const std::string& fileLine);
+        void readStatusFile(const std::string& processNumber);
+        static std::unordered_map<std::string, std::string> parseStatusFile(std::ifstream& file);
 
     public:
-        Process(const string& processName);
-        void refresh(const string &pidFileName);
+        Process(const std::string& processName);
+        void refresh(const std::string &pidFileName);
         void print() const;
         //getters & setters
-        string getPid() const;
-        string getName();
-        string getState();
-        string getUtime();
-        string getsTime();
-        string getStartTime();
-        string getVmRSS();
-        string getVmSize();
-        void setPid(const string &pid);
-        void setName(const string &name);
-        void setState(const string& state);
-        void setUtime(const string& utime);
-        void setStime(const string& stime);
-        void setStartTime(const string& startTime);
-        void setVmRSS(const string& vmRss);
-        void setVmSize(const string& VmSize);
+        std::string getPid() const;
+        std::string getName();
+        std::string getState();
+        std::string getUtime();
+        std::string getsTime();
+        std::string getStartTime();
+        std::string getVmRSS();
+        std::string getVmSize();
+        void setPid(const std::string &pid);
+        void setName(const std::string &name);
+        void setState(const std::string& state);
+        void setUtime(const std::string& utime);
+        void setStime(const std::string& stime);
+        void setStartTime(const std::string& startTime);
+        void setVmRSS(const std::string& vmRss);
+        void setVmSize(const std::string& VmSize);
     };
 }
 

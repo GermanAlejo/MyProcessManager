@@ -10,6 +10,8 @@
 #include "../include/errors.h"
 #include "../include/process_types.h"
 
+using namespace std;
+
 namespace myProc {
     //Constructors
     Process::Process(const string &processName) {
@@ -70,10 +72,16 @@ namespace myProc {
             }
             unordered_map<string, string> statusMap = parseStatusFile(pidStatusFile);
 
-            //TODO: Change this to dynamic
             //Extract values from map
-            setVmRSS(statusMap.at("VmRSS"));
-            setVmSize(statusMap.at("VmSize"));
+            //we iterate over the fields
+            for (size_t i = 0; i < types::STATUS_FIELD_COUNT; ++i) {
+                //fieldData with function meta
+                const auto &meta = types::STATUS_FIELDS[i];
+                // Look up the extracted value with iterator
+                if (auto it = statusMap.find(meta.name); it != statusMap.end()) {
+                    meta.setter(*this, it->second); // Apply the setter lambda
+                }
+            }
 
             pidStatusFile.close();
         } catch (ProcessError &e) {
@@ -105,46 +113,26 @@ namespace myProc {
     }
 
     unordered_map<string, string> Process::parseStatusFile(ifstream &file) {
-        //TODO: Change this to a more dynamic way
+        unordered_map<string, string> allValues;
         unordered_map<string, string> statusData;
-        //TODO: this changes as we need to parse several lines
+        //loop all lines of file
         for (string line; getline(file, line);) {
-            if (statusData.size() >= 2) {
-                break;
+            //for each line split by \t
+            vector<string> lineValues = commonLib::splitStringByChar(line, '\t');
+            //some values from status file are in several columns, ignore those for the moment
+            if (lineValues.size() != 2) {
+                continue;
             }
-            vector<string> values = commonLib::splitStringByChar(line, '\t');
-            if (line.starts_with("VmRSS")) {
-                statusData.insert({"VmRSS", line});
-            } else if (line.starts_with("VmSize")) {
-                statusData.insert({"VmSize", line});
-            }
+            //remove ':' from name values
+            lineValues.at(0).pop_back();
+            allValues[lineValues.at(0)] = lineValues.at(1); //save values from lines into map
+        }
+        //now we loop the static list searching for out values
+        for (size_t i = 0; i < types::STATUS_FIELD_COUNT; ++i) {
+            const auto &fieldData = types::STATUS_FIELDS[i];
+            statusData[fieldData.name] = allValues[fieldData.name];
         }
         return statusData;
-    }
-
-
-    /**
-     * This method reads a line from a file
-     * we only need one line as the status files are only parsed in one line
-     * @param filePath
-     * @return
-     */
-    string readProcessFile(const string &filePath) {
-        //check errors
-        //TODO: Maybe more checks?
-        if (filePath.empty() || !filePath.starts_with('/')) {
-            perror("File path is not correct");
-            throw ProcessFileError("File path not correct");
-        }
-        ifstream file(filePath);
-        string line;
-        if (!file.is_open()) {
-            perror("Error reading file");
-            throw ProcessFileError("Error opening file");
-        }
-        //get line and loop with spaces
-        getline(file, line);
-        return line;
     }
 
     //public methods
@@ -159,8 +147,8 @@ namespace myProc {
                 "uTime: \t\t\t" << utime << "\n" <<
                 "sTime: \t\t\t" << stime << "\n" <<
                 "start time: \t\t\t" << startTime << "\n" <<
-                VmRSS << "\n" <<
-                VmSize << "\n";
+                "VmRSS: \t\t" << VmRSS << "\n" <<
+                "VmSize: \t\t" << VmSize << "\n";
     }
 
     //getters & setters
