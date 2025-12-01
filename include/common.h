@@ -9,6 +9,7 @@
 
 #include <string>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
 namespace myProc::commonLib {
@@ -16,8 +17,12 @@ namespace myProc::commonLib {
     inline constexpr char procBase[] = "/proc/";
     inline constexpr char statPath[] = "/stat";
     inline constexpr char statusPath[] = "/status";
+    inline constexpr char uptimePath[] ="uptime";//does not depent of a process so remove /
     inline constexpr char processPathStatus[] = "/proc/*/status";
     inline constexpr std::string_view processFinderChar = "/*";
+
+    std::unordered_map<std::string, std::string> getUptimeData();
+    std::unordered_map<std::string, std::string> parseUptimeFile(const std::string &line);
 
     enum state {
         R = 'R', //Running
@@ -34,6 +39,8 @@ namespace myProc::commonLib {
         P = 'P', //Parked (Linux 3.9 to 3.13 only)
         I = 'I', //Idle (Linux 4.14 onward)
     };
+
+    std::string getUptimePath();
 
     std::string getStateString(const char &stateChar);
 

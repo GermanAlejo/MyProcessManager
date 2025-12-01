@@ -1,4 +1,6 @@
 #include <iostream>
+
+#include "common.h"
 #include "../include/process.h"
 
 using namespace myProc;
@@ -9,6 +11,7 @@ int main() {
     //Process newProcessTest2 ("5007");
 
     newProcessTest.print();
+    commonLib::getUptimeData();
 
     return 0;
 }
