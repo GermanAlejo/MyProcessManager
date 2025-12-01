@@ -27,8 +27,11 @@ target_include_directories(types PUBLIC include)
 add_library(common ${COMMON_SRC})
 target_include_directories(common PUBLIC include)
 
+# Add external libraries
+find_package(spdlog REQUIRED)
+
 # Main executable
 add_executable(MyProcessManager src/main.cpp)
-target_link_libraries(MyProcessManager PRIVATE process errors types common)
+target_link_libraries(MyProcessManager PRIVATE process errors types common spdlog::spdlog)
 
 

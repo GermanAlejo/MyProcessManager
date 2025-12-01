@@ -1,10 +1,9 @@
 //
 // Created by german on 24/11/25.
 //
-#include <map>
-#include <ranges>
 #include <fstream>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include "../include/common.h"
 #include "../include/process.h"
 #include "../include/errors.h"
@@ -15,6 +14,7 @@ using namespace std;
 namespace myProc {
     //Constructors
     Process::Process(const string &processName) {
+        spdlog::info("Creating new process with pid: {}", processName);
         readStatFile(processName);
         readStatusFile(processName);
     }
@@ -22,18 +22,19 @@ namespace myProc {
     //Private methods
     void Process::readStatFile(const string &processNumber) {
         try {
+            spdlog::info("Reading stat file");
             //Check error
             string statFile = commonLib::getStatPath(processNumber);
             //check errors
             if (statFile.empty() || !statFile.starts_with('/')) {
-                perror("File path is not correct");
+                spdlog::error("File path not found!");
                 throw ProcessFileError("File path not correct");
             }
 
             ifstream pidFile(statFile);
             string line;
             if (!pidFile.is_open()) {
-                perror("Error reading file");
+                spdlog::error("File found - but could not be open");
                 throw ProcessFileError("Error opening file");
             }
             //get line and loop with spaces
@@ -52,22 +53,23 @@ namespace myProc {
 
             pidFile.close();
         } catch (ProcessError &e) {
-            std::cerr << "Process error: " << e.what() << "\n";
+            spdlog::error("Process error: {}", e.what());
             throw ProcessError("Process error"); //TODO: maybe this should be change to capture all possiblea exceptions
         }
     }
 
     void Process::readStatusFile(const string &processNumber) {
         try {
+            spdlog::info("Reading status file");
             string statusFile = commonLib::getStatusPath(processNumber);
             //check errors
             if (statusFile.empty() || !statusFile.starts_with('/')) {
-                perror("File path is not correct");
+                spdlog::error("File path not found!");
                 throw ProcessFileError("File path not correct");
             }
             ifstream pidStatusFile(statusFile);
             if (!pidStatusFile.is_open()) {
-                perror("Error reading file");
+                spdlog::error("File found - but could not be open");
                 throw ProcessFileError("Error opening file");
             }
             unordered_map<string, string> statusMap = parseStatusFile(pidStatusFile);
@@ -85,14 +87,15 @@ namespace myProc {
 
             pidStatusFile.close();
         } catch (ProcessError &e) {
-            std::cerr << "Process error: " << e.what() << "\n";
+            spdlog::error("Process error: {}", e.what());
             throw ProcessError("Process error"); //TODO: maybe this should be change to capture all possiblea exceptions
         }
     }
 
     unordered_map<string, string> Process::parseStatFile(const string &fileLine) {
+        spdlog::info("Parsing stat file");
         if (fileLine.empty()) {
-            perror("Empty line provided");
+            spdlog::error("Empty line provided");
             throw ProcessReadError("Empty line");
         }
 
@@ -113,6 +116,7 @@ namespace myProc {
     }
 
     unordered_map<string, string> Process::parseStatusFile(ifstream &file) {
+        spdlog::info("Parsing status file");
         unordered_map<string, string> allValues;
         unordered_map<string, string> statusData;
         //loop all lines of file
@@ -121,6 +125,7 @@ namespace myProc {
             vector<string> lineValues = commonLib::splitStringByChar(line, '\t');
             //some values from status file are in several columns, ignore those for the moment
             if (lineValues.size() != 2) {
+                spdlog::debug("Skipping line - multiple values!");
                 continue;
             }
             //remove ':' from name values
@@ -209,7 +214,7 @@ namespace myProc {
     }
 
     string Process::getVmSize() {
-        return this->getVmSize();
+        return this->VmSize;
     }
 
     void Process::setVmSize(const string &VmSize) {
