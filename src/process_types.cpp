@@ -2,9 +2,8 @@
 // Created by german on 30/11/25.
 //
 
-#include <cstdint>
-
 #include "process_types.h"
+#include "common.h"
 
 using namespace std;
 
@@ -16,8 +15,6 @@ namespace myProc::types {
         {14, "utime", [](Process &p, const string &val) {p.setUtime(stoull(val));}},
         {15, "stime", [](Process &p, const string &val) {p.setStime(stoull(val));}},
         {22, "starttime",  [](Process &p, const string &val){p.setStartTime(stoull(val));}},
-        {23, "vsize", [](Process &p, const string &val) {p.setVmSize(stoul(val));}},
-        {24, "rss", [](Process &p, const string &val){p.setVmRSS(stoul(val));}},
         //add more fields here
     };
 
@@ -27,6 +24,6 @@ namespace myProc::types {
     };
 
     const size_t FIELD_COUNT = sizeof(FIELDS) / sizeof(FieldData);
-    const size_t STATUS_FIELD_COUNT = sizeof(STATUS_FIELDS) / sizeof(FieldData);
+    const size_t STATUS_FIELD_COUNT = sizeof(STATUS_FIELDS) / sizeof(StatusFieldData);
 
 }

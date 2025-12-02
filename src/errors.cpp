@@ -12,10 +12,8 @@ ProcessError::ProcessError(const std::string& msg)
 ProcessFileError::ProcessFileError(const string& msg)
 : ProcessError(msg) {}
 
-
 ProcessNotFound::ProcessNotFound(const string& msg)
     : ProcessError(msg) {}
-
 
 ProcessAccessDenied::ProcessAccessDenied(const string& msg)
     : ProcessError(msg) {}

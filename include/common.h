@@ -8,7 +8,6 @@
 #define MYPROCESSMANAGER_COMMON_H
 
 #include <string>
-#include <sstream>
 #include <unordered_map>
 #include <vector>
 
@@ -17,14 +16,14 @@ namespace myProc::commonLib {
     inline constexpr char procBase[] = "/proc/";
     inline constexpr char statPath[] = "/stat";
     inline constexpr char statusPath[] = "/status";
-    inline constexpr char uptimePath[] ="uptime";//does not depent of a process so remove /
+    inline constexpr char uptimePath[] = "uptime"; //does not depent of a process so remove /
     inline constexpr char processPathStatus[] = "/proc/*/status";
     inline constexpr std::string_view processFinderChar = "/*";
-
-    inline constexpr std::string_view TOTAL_TIME_KEY = "totalTime";//return as uint64_t
-    inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime";//return as uint64_t
+    inline constexpr std::string_view TOTAL_TIME_KEY = "totalTime"; //return as uint64_t
+    inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime"; //return as uint64_t
 
     std::unordered_map<std::string_view, uint64_t> getUptimeData();
+
     std::unordered_map<std::string_view, uint64_t> parseUptimeFile(const std::string &line);
 
     enum state {

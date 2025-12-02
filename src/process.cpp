@@ -147,7 +147,7 @@ namespace myProc {
         readStatFile(pidFileName);
         double cpu = calculateCPU();
         double ram = calculateMemory();
-        //TODO: replace this
+        //TODO: replace this print cpu in %
         spdlog::info("CPU: {} | Memory: {} MB", cpu, ram);
     }
 
@@ -160,13 +160,14 @@ namespace myProc {
         long totalTime = getUtime() + getsTime(); //total process time
         //Convert process total time to seconds
         double seconds = totalTime / ticks; //this should stay as double
-        //how long the process has been running
+        //how long the process has been running in sec
         double processUpTime = systemUpTime - (getStartTime() / ticks);
         double cpuUsage = seconds / processUpTime;
-        return cpuUsage;
+        return cpuUsage * 100;//TODO: Calcula % properly and trunk
     }
 
     double Process::calculateMemory() const {
+        //TODO: check this conversion
         return getVmRSS() / 1024.0;
     }
 

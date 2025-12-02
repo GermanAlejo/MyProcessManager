@@ -4,10 +4,11 @@
 
 
 #pragma once
-#include <stdexcept>
 
 #ifndef MYPROCESSMANAGER_ERRORS_H
 #define MYPROCESSMANAGER_ERRORS_H
+
+#include <stdexcept>
 
 class ProcessError : public std::runtime_error {
 public:

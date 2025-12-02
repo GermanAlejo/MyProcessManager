@@ -2,13 +2,13 @@
 // Created by german on 30/11/25.
 //
 
+#pragma once
 #ifndef MYPROCESSMANAGER_PROCESS_TYPES_H
 #define MYPROCESSMANAGER_PROCESS_TYPES_H
 
 #include <string>
 #include <functional>
 #include "process.h"
-#include "common.h"
 
 namespace myProc::types {
     /**
