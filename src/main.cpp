@@ -11,7 +11,7 @@ int main() {
     //Process newProcessTest2 ("5007");
 
     newProcessTest.print();
-    commonLib::getUptimeData();
+    newProcessTest.refresh(newProcessTest.getPid());
 
     return 0;
 }

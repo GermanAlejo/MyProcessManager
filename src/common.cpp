@@ -11,9 +11,8 @@
 using namespace std;
 
 namespace  myProc::commonLib {
-    unordered_map<string, string> getUptimeData() {
+    unordered_map<string_view, uint64_t> getUptimeData() {
         spdlog::info("Reading uptime file");
-        unordered_map<string, string> uptimeMap;
         string path = getUptimePath();
         //check errors
         if (path.empty() || !path.starts_with('/')) {
@@ -30,12 +29,10 @@ namespace  myProc::commonLib {
 
         //get line and loop with spaces
         getline(uptimeFile, line);
-        unordered_map<string, string> processMap = parseUptimeFile(line);
-
-        return uptimeMap;
+        return parseUptimeFile(line);
     }
 
-    unordered_map<string, string> parseUptimeFile(const string &line) {
+    unordered_map<string_view, uint64_t> parseUptimeFile(const string &line) {
         spdlog::info("Parsing uptime file");
         if (line.empty()) {
             spdlog::error("Empty line provided");
@@ -44,7 +41,7 @@ namespace  myProc::commonLib {
 
         //get stream from line and parse it
         stringstream ss(line);
-        unordered_map<string, string> uptimeMap;
+        unordered_map<string_view, uint64_t> uptimeMap;
         //extract direcly as is always 2 values
         //make a for to extract all values
         ss >> uptimeMap["totalTime"] >> uptimeMap["idleTime"];

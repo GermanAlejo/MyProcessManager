@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
+
 #include "../include/common.h"
 #include "../include/process.h"
 #include "../include/errors.h"
@@ -142,7 +143,31 @@ namespace myProc {
 
     //public methods
     void Process::refresh(const string &pidFileName) {
+        spdlog::info("REFRESHING - {}", pid);
         readStatFile(pidFileName);
+        double cpu = calculateCPU();
+        double ram = calculateMemory();
+        //TODO: replace this
+        spdlog::info("CPU: {} | Memory: {} MB", cpu, ram);
+    }
+
+    double Process::calculateCPU() const {
+        //TODO: Implement error catching here
+        spdlog::info("Calculating CPU usage for: {}", getPid());
+        unordered_map<string_view, uint64_t> timeMap = commonLib::getUptimeData();
+        const uint64_t systemUpTime = timeMap[commonLib::TOTAL_TIME_KEY]; //total up time in seconds
+        long ticks = sysconf(_SC_CLK_TCK); //Clock ticks per second (usually 100 on Linux)
+        long totalTime = getUtime() + getsTime(); //total process time
+        //Convert process total time to seconds
+        double seconds = totalTime / ticks; //this should stay as double
+        //how long the process has been running
+        double processUpTime = systemUpTime - (getStartTime() / ticks);
+        double cpuUsage = seconds / processUpTime;
+        return cpuUsage;
+    }
+
+    double Process::calculateMemory() const {
+        return getVmRSS() / 1024.0;
     }
 
     void Process::print() const {
@@ -181,43 +206,43 @@ namespace myProc {
         this->state = state;
     }
 
-    string Process::getsTime() {
-        return this->stime;
+    unsigned long long Process::getsTime() const {
+        return stoll(this->stime);
     }
 
-    void Process::setStime(const string &stime) {
-        this->stime = stime;
+    void Process::setStime(const unsigned long long &stime) {
+        this->stime = to_string(stime);
     }
 
-    string Process::getUtime() {
-        return this->utime;
+    unsigned long long Process::getUtime() const {
+        return stoll(this->utime);
     }
 
-    void Process::setUtime(const string &utime) {
-        this->utime = utime;
+    void Process::setUtime(const unsigned long long &utime) {
+        this->utime = to_string(utime);
     }
 
-    string Process::getStartTime() {
-        return this->startTime;
+    uint64_t Process::getStartTime() const {
+        return stoull(this->startTime);
     }
 
-    void Process::setStartTime(const string &startTime) {
-        this->startTime = startTime;
+    void Process::setStartTime(const uint64_t &startTime) {
+        this->startTime = to_string(startTime);
     }
 
-    string Process::getVmRSS() {
-        return this->VmRSS;
+    unsigned long Process::getVmRSS() const {
+        return stoul(this->VmRSS);
     }
 
-    void Process::setVmRSS(const string &vmRss) {
-        this->VmRSS = vmRss;
+    void Process::setVmRSS(const unsigned long &vmRss) {
+        this->VmRSS = to_string(vmRss);
     }
 
-    string Process::getVmSize() {
-        return this->VmSize;
+    unsigned long Process::getVmSize() const {
+        return stoul(this->VmSize);
     }
 
-    void Process::setVmSize(const string &VmSize) {
-        this->VmSize = VmSize;
+    void Process::setVmSize(const unsigned long &VmSize) {
+        this->VmSize = to_string(VmSize);
     }
 }

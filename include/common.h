@@ -21,8 +21,11 @@ namespace myProc::commonLib {
     inline constexpr char processPathStatus[] = "/proc/*/status";
     inline constexpr std::string_view processFinderChar = "/*";
 
-    std::unordered_map<std::string, std::string> getUptimeData();
-    std::unordered_map<std::string, std::string> parseUptimeFile(const std::string &line);
+    inline constexpr std::string_view TOTAL_TIME_KEY = "totalTime";//return as uint64_t
+    inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime";//return as uint64_t
+
+    std::unordered_map<std::string_view, uint64_t> getUptimeData();
+    std::unordered_map<std::string_view, uint64_t> parseUptimeFile(const std::string &line);
 
     enum state {
         R = 'R', //Running
