@@ -90,6 +90,11 @@ namespace  myProc::commonLib {
         return string(procBase) + string(uptimePath);
     }
 
+    std::string getExecutablePath(const std::string &pid) {
+        return procBase + pid + executablePath;
+    }
+
+
     vector<string> splitStringByChar(const string &lineString, const char &delimiter) {
         stringstream ss(lineString);
         string segment;
@@ -101,4 +106,12 @@ namespace  myProc::commonLib {
         }
         return result;
     }
+
+    bool isNumber(const std::string &str) {
+        for (const char &c : str) {
+            if (isdigit(c) == 0) return false;
+        }
+        return true;
+    }
+
 }

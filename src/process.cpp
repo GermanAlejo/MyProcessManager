@@ -136,6 +136,11 @@ namespace myProc {
         //now we loop the static list searching for out values
         for (size_t i = 0; i < types::STATUS_FIELD_COUNT; ++i) {
             const auto &fieldData = types::STATUS_FIELDS[i];
+            //if empty we didn't find the parameters we were looking for
+            if (allValues[fieldData.name].empty()) {
+                spdlog::warn("Field status property: {} not found in status field", fieldData.name);
+                continue;
+            }
             statusData[fieldData.name] = allValues[fieldData.name];
         }
         return statusData;

@@ -25,7 +25,7 @@ namespace myProc {
 
         void readStatFile(const std::string &processNumber);
 
-        std::unordered_map<std::string, std::string> parseStatFile(const std::string &fileLine);
+        static std::unordered_map<std::string, std::string> parseStatFile(const std::string &fileLine);
 
         void readStatusFile(const std::string &processNumber);
 

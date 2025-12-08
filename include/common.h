@@ -15,6 +15,7 @@ namespace myProc::commonLib {
     inline constexpr char processPath[] = "/proc/*/stat";
     inline constexpr char procBase[] = "/proc/";
     inline constexpr char statPath[] = "/stat";
+    inline constexpr char executablePath[] = "/exe";
     inline constexpr char statusPath[] = "/status";
     inline constexpr char uptimePath[] = "uptime"; //does not depent of a process so remove /
     inline constexpr char processPathStatus[] = "/proc/*/status";
@@ -50,7 +51,11 @@ namespace myProc::commonLib {
 
     std::string getStatusPath(const std::string &pid);
 
+    std::string getExecutablePath(const std::string &pid);
+
     std::vector<std::string> splitStringByChar(const std::string &lineString, const char &delimiter);
+
+    bool isNumber(const std::string &str);
 }
 
 #endif //MYPROCESSMANAGER_COMMON_H

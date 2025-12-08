@@ -9,12 +9,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Source grouping
+file(GLOB_RECURSE ACTIVE_SRC "src/activeProcesses.cpp")
 file(GLOB_RECURSE PROCESS_SRC "src/process.cpp")
 file(GLOB_RECURSE ERROR_SRC "src/errors.cpp")
 file(GLOB_RECURSE TYPES_SRC "src/process_types.cpp")
 file(GLOB_RECURSE COMMON_SRC "src/common.cpp")
 
 # Include folder (root include path)
+add_library(activeProcesses ${ACTIVE_SRC})
+target_include_directories(activeProcesses PUBLIC include)
+
 add_library(process ${PROCESS_SRC})
 target_include_directories(process PUBLIC include)
 
@@ -32,6 +36,6 @@ find_package(spdlog REQUIRED)
 
 # Main executable
 add_executable(MyProcessManager src/main.cpp)
-target_link_libraries(MyProcessManager PRIVATE process errors types common spdlog::spdlog)
+target_link_libraries(MyProcessManager PRIVATE activeProcesses process errors types common spdlog::spdlog)
 
 
