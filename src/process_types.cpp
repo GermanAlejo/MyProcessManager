@@ -8,7 +8,7 @@
 using namespace std;
 
 namespace myProc::types {
-    const FieldData FIELDS[] = {
+    const LineFieldData LINE_FIELDS[] = {
         {1, "pid", [](Process &p, const string &val) { p.setPid(val);}},
         {2, "comm", [](Process &p, const string &val) { p.setName(val);}},
         {3, "state", [](Process &p, const string &val) { p.setState(commonLib::getStateString(val[0]));}},
@@ -18,12 +18,19 @@ namespace myProc::types {
         //add more fields here
     };
 
-    const StatusFieldData STATUS_FIELDS[] = {
+    const ColFieldData<Process> COLUM_FIELDS[] = {
         {"VmRSS", [](Process &p, const string &val) {p.setVmRSS(stoul(val));}},
-        {"VmSize", [](Process &p, const string &val) {p.setVmSize(stoul(val));}},
+        {"VmSize", [](Process &p, const string &val) {p.setVmSize(stoul(val));}}
     };
 
-    const size_t FIELD_COUNT = sizeof(FIELDS) / sizeof(FieldData);
-    const size_t STATUS_FIELD_COUNT = sizeof(STATUS_FIELDS) / sizeof(StatusFieldData);
+    const ColFieldData<SystemMonitor> SYSTEM_FIELDS[] = {
+        {"MemTotal", [](SystemMonitor &m, const string &val) {m.set_total_ram(stoul(val));}},
+        {"MemAvailable", [](SystemMonitor &m, const string &val) {m.set_available_ram(stoul(val));}},
+        {"totalTime", [](SystemMonitor &m, const string &val) {m.set_uptime(stoull(val));}}
+    };
+
+    const size_t LINE_FIELD_COUNT = sizeof(LINE_FIELDS) / sizeof(LineFieldData);
+    const size_t COLUM_FIELD_COUNT = sizeof(COLUM_FIELDS) / sizeof(ColFieldData<Process>);
+    const size_t SYSTEM_FIELD_COUNT = sizeof(SYSTEM_FIELDS) / sizeof(ColFieldData<SystemMonitor>);
 
 }

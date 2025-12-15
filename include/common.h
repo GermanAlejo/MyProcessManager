@@ -18,6 +18,7 @@ namespace myProc::commonLib {
     inline constexpr char executablePath[] = "/exe";
     inline constexpr char statusPath[] = "/status";
     inline constexpr char uptimePath[] = "uptime"; //does not depent of a process so remove /
+    inline constexpr char memInfoPath[] = "meminfo";
     inline constexpr char processPathStatus[] = "/proc/*/status";
     inline constexpr std::string_view processFinderChar = "/*";
     inline constexpr std::string_view TOTAL_TIME_KEY = "totalTime"; //return as uint64_t
@@ -45,9 +46,11 @@ namespace myProc::commonLib {
 
     std::string getUptimePath();
 
+    std::string getMemInfoPath();
+
     std::string getStateString(const char &stateChar);
 
-    std::string getStatPath(const std::string &pid);
+    std::string getStatPath(const std::string &pid = ""); //use this for monitor
 
     std::string getStatusPath(const std::string &pid);
 

@@ -1,9 +1,6 @@
-#include <iostream>
-#include <ranges>
 
 #include "activeProcesses.h"
-#include "common.h"
-#include "../include/process.h"
+#include "systemMonitor.h"
 
 using namespace myProc;
 
@@ -13,9 +10,10 @@ int main() {
 //
     //newProcessTest.print();
     //newProcessTest.refresh(newProcessTest.getPid());
-
+    SystemMonitor m;
+    //m.set_total_ram(1024);
     ActiveProcesses allProcesses;
-    allProcesses.printProcessContainer();
+    //allProcesses.printProcessContainer();
 
     return 0;
 }

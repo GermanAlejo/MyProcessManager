@@ -14,8 +14,12 @@ file(GLOB_RECURSE PROCESS_SRC "src/process.cpp")
 file(GLOB_RECURSE ERROR_SRC "src/errors.cpp")
 file(GLOB_RECURSE TYPES_SRC "src/process_types.cpp")
 file(GLOB_RECURSE COMMON_SRC "src/common.cpp")
+file(GLOB_RECURSE MONITOR_SRC "src/systemMonitor.cpp")
 
 # Include folder (root include path)
+add_library(monitor ${MONITOR_SRC})
+target_include_directories(monitor PUBLIC include)
+
 add_library(activeProcesses ${ACTIVE_SRC})
 target_include_directories(activeProcesses PUBLIC include)
 
@@ -36,6 +40,6 @@ find_package(spdlog REQUIRED)
 
 # Main executable
 add_executable(MyProcessManager src/main.cpp)
-target_link_libraries(MyProcessManager PRIVATE activeProcesses process errors types common spdlog::spdlog)
+target_link_libraries(MyProcessManager PRIVATE monitor activeProcesses process errors types common spdlog::spdlog)
 
 

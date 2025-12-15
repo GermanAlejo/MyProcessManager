@@ -15,13 +15,27 @@ using namespace std;
 
 namespace myProc {
     ActiveProcesses::ActiveProcesses() {
+        spdlog::info("Creating process container");
         readProcDir();
     }
+
+    void ActiveProcesses::refresh() const {
+        try {
+            spdlog::info("Refreshing process container");
+            for (Process p : processesVector) {
+                p.refresh();
+            }
+        } catch (ProcessError &err) {
+            spdlog::error("Error refreshing - {}", err.what());
+            throw ProcessReadError("Could not refresh process");
+        }
+    }
+
 
     void ActiveProcesses::readProcDir() {
         try {
             spdlog::info("Creating container");
-            filesystem::path rootPath = commonLib::procBase;
+            const filesystem::path rootPath = commonLib::procBase;
             if (!filesystem::exists(rootPath)) {
                 spdlog::error("Proc base path does not exist or is corrupted");
                 throw ProcessReadError("Proc base path not found!");

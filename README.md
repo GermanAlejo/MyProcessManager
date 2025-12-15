@@ -1,5 +1,7 @@
 # Process Manager
 
+A linux process reader to practice c++
+
 ## Entities
 
 ### Process
@@ -8,8 +10,8 @@ attributes:
 - int pid: code of the process
 - string name name of the process
 
-construyctors:
-- constructortaking a pid
+constructors:
+- constructor taking a pid
 - taking a pid and a name
 
 methods

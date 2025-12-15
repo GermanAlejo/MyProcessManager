@@ -35,7 +35,7 @@ namespace myProc {
         Process(const std::string &processName);
 
         //call this function each x seconds to refresh process data
-        void refresh(const std::string &pidFileName);
+        void refresh();
 
         //function to calculate cpu usage
         double calculateCPU() const;

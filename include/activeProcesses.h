@@ -18,6 +18,7 @@ namespace myProc {
     private:
         std::vector<Process> processesVector;
 
+        void refresh() const;
     public:
         ActiveProcesses();
 

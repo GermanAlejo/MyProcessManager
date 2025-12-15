@@ -43,9 +43,9 @@ namespace myProc {
             unordered_map<string, string> processMap = parseStatFile(line);
 
             //we iterate over the fields
-            for (size_t i = 0; i < types::FIELD_COUNT; ++i) {
+            for (size_t i = 0; i < types::LINE_FIELD_COUNT; ++i) {
                 //fieldData with function meta
-                const auto &meta = types::FIELDS[i];
+                const auto &meta = types::LINE_FIELDS[i];
                 // Look up the extracted value with iterator
                 if (auto it = processMap.find(meta.name); it != processMap.end()) {
                     meta.setter(*this, it->second); // Apply the setter lambda
@@ -77,9 +77,9 @@ namespace myProc {
 
             //Extract values from map
             //we iterate over the fields
-            for (size_t i = 0; i < types::STATUS_FIELD_COUNT; ++i) {
+            for (size_t i = 0; i < types::COLUM_FIELD_COUNT; ++i) {
                 //fieldData with function meta
-                const auto &meta = types::STATUS_FIELDS[i];
+                const auto &meta = types::COLUM_FIELDS[i];
                 // Look up the extracted value with iterator
                 if (auto it = statusMap.find(meta.name); it != statusMap.end()) {
                     meta.setter(*this, it->second); // Apply the setter lambda
@@ -108,8 +108,8 @@ namespace myProc {
         for (int pos = 1; ss >> allValues[pos]; ++pos);
 
         //save only values we want
-        for (size_t i = 0; i < types::FIELD_COUNT; ++i) {
-            const auto &fieldData = types::FIELDS[i];
+        for (size_t i = 0; i < types::LINE_FIELD_COUNT; ++i) {
+            const auto &fieldData = types::LINE_FIELDS[i];
             processesMap[fieldData.name] = allValues[fieldData.pos];
         }
 
@@ -134,8 +134,8 @@ namespace myProc {
             allValues[lineValues.at(0)] = lineValues.at(1); //save values from lines into map
         }
         //now we loop the static list searching for out values
-        for (size_t i = 0; i < types::STATUS_FIELD_COUNT; ++i) {
-            const auto &fieldData = types::STATUS_FIELDS[i];
+        for (size_t i = 0; i < types::COLUM_FIELD_COUNT; ++i) {
+            const auto &fieldData = types::COLUM_FIELDS[i];
             //if empty we didn't find the parameters we were looking for
             if (allValues[fieldData.name].empty()) {
                 spdlog::warn("Field status property: {} not found in status field", fieldData.name);
@@ -147,9 +147,9 @@ namespace myProc {
     }
 
     //public methods
-    void Process::refresh(const string &pidFileName) {
+    void Process::refresh() {
         spdlog::info("REFRESHING - {}", pid);
-        readStatFile(pidFileName);
+        readStatFile(pid);
         double cpu = calculateCPU();
         double ram = calculateMemory();
         //TODO: replace this print cpu in %

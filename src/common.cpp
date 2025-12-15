@@ -13,7 +13,7 @@ using namespace std;
 namespace  myProc::commonLib {
     unordered_map<string_view, uint64_t> getUptimeData() {
         spdlog::info("Reading uptime file");
-        string path = getUptimePath();
+        const string path = getUptimePath();
         //check errors
         if (path.empty() || !path.starts_with('/')) {
             spdlog::error("File path not found!");
@@ -44,7 +44,7 @@ namespace  myProc::commonLib {
         unordered_map<string_view, uint64_t> uptimeMap;
         //extract direcly as is always 2 values
         //make a for to extract all values
-        ss >> uptimeMap["totalTime"] >> uptimeMap["idleTime"];
+        ss >> uptimeMap[TOTAL_TIME_KEY] >> uptimeMap[TOTAL_IDLE_KEY];
         return uptimeMap;
     }
 
@@ -79,11 +79,20 @@ namespace  myProc::commonLib {
     }
 
     string getStatPath(const string &pid) {
+        if (pid.empty()) {
+            string base = procBase;
+            base.pop_back();
+            return base + string(statPath);
+        }
         return procBase + pid + statPath;
     }
 
+    std::string getMemInfoPath() {
+        return string(procBase) + string(memInfoPath);
+    }
+
     string getStatusPath(const string &pid) {
-        return procBase + pid + statusPath;
+        return string(procBase) + pid +string(statusPath);
     }
 
     string getUptimePath() {
@@ -91,7 +100,7 @@ namespace  myProc::commonLib {
     }
 
     std::string getExecutablePath(const std::string &pid) {
-        return procBase + pid + executablePath;
+        return string(procBase) + pid + string(executablePath);
     }
 
 
