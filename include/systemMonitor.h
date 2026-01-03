@@ -13,13 +13,20 @@
 
 namespace myProc {
     class SystemMonitor {
+
+    /**
+     *  Calculate values in numeric and later in printing get string in %
+     *
+     */
     private:
         int totalProcesses{};
-        unsigned long totalRam{};
-        unsigned long usedRam{};
-        unsigned long availableRam{};
-        double totalCPU{};
+        //values that can be read
+        unsigned long totalRam{};//in kB
+        unsigned long availableRam{};//in kB
         uint64_t uptime{}; //use methods from common
+        //values to compute
+        unsigned long usedRam{};
+        double totalCPU{};//cpu usage
 
         void refresh();
         void readMemInfo();

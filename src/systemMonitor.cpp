@@ -35,8 +35,19 @@ namespace myProc {
             }
             unordered_map<string, string> memFileData = parseMemInfo(memFile);
 
-            //Call the setters here
-            //TODO:
+            //get attribute values
+            for (size_t i = 0; i < types::SYSTEM_FIELD_COUNT; ++i) {
+                //fieldData with function meta
+                const auto &meta = types::SYSTEM_FIELDS[i];
+                // Look up the extracted value with iterator
+                if (auto it = memFileData.find(meta.name); it != memFileData.end()) {
+                    meta.setter(*this, it->second); // Apply the setter lambda
+                }
+            }
+
+            //Now we calculate values
+            //calculate used memory
+            set_used_ram(total_ram() - available_ram());
 
             memFile.close();
         } catch (ProcessError &err) {
@@ -114,6 +125,8 @@ namespace myProc {
     std::unordered_map<string, string> SystemMonitor::parseStatFile(ifstream &statFile) {
         spdlog::info("Parsing stat file");
         unordered_map<string, string> statDataMap;
+
+
         return  statDataMap;
     }
 
