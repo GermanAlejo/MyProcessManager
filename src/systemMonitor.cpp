@@ -7,13 +7,14 @@
 
 #include "systemMonitor.h"
 #include "process_types.h"
+#include "cpuSnapShot.h"
 #include "common.h"
 #include "errors.h"
 
 using namespace std;
 
 namespace myProc {
-    SystemMonitor::SystemMonitor () {
+    SystemMonitor::SystemMonitor() {
         spdlog::info("Creating system monitor");
         readMemInfo();
         readUpTime();
@@ -70,7 +71,15 @@ namespace myProc {
                 throw ProcessFileError("Stat file cannot be opened");
             }
             //Parse file here
+            //TODO: Implement file read into snap shot
             parseStatFile(statFile);
+
+            //Wait 1 sec
+
+            //Check for previous value, if not empty replace
+            //Read file second time
+
+            //Compare snapshots and calculate cpu% usage
 
             statFile.close();
         } catch (ProcessError &err) {
@@ -87,14 +96,14 @@ namespace myProc {
             const auto &meta = types::SYSTEM_FIELDS[i];
             // Look up the extracted value with iterator
             if (auto it = uptimeDataMap.find(meta.name); it != uptimeDataMap.end()) {
-                string val = to_string(it->second);//we need to cast this value
+                string val = to_string(it->second); //we need to cast this value
                 meta.setter(*this, val); // Apply the setter lambda
             }
         }
     }
 
     //Save logic as status file
-    std::unordered_map<string, string> SystemMonitor::parseMemInfo(ifstream &memFile) {
+    unordered_map<string, string> SystemMonitor::parseMemInfo(ifstream &memFile) {
         spdlog::info("Parsing meminfo file");
         unordered_map<string, string> memDataMap;
         unordered_map<string, string> allValues;
@@ -104,35 +113,61 @@ namespace myProc {
             vector<string> lineValues = commonLib::splitStringByChar(line, ':');
             //remove empty whitespaces
             string &lineValue = lineValues.at(1);
-            lineValue.erase(ranges::remove_if(lineValue, [](const unsigned char c){ return std::isspace(c); }).begin(), lineValue.end());
+            lineValue.erase(ranges::remove_if(
+                                lineValue, [](const unsigned char c) {
+                                    return std::isspace(c);
+                                }).begin(), lineValue.end());
             allValues[lineValues.at(0)] = lineValues.at(1);
         }
         //now loop the static list searching for the values in the map
         for (size_t i = 0; i < types::SYSTEM_FIELD_COUNT; ++i) {
-            const auto &fielData = types::SYSTEM_FIELDS[i];
+            const auto &fieldData = types::SYSTEM_FIELDS[i];
             //Check for empty value
-            if (allValues[fielData.name].empty()) {
-                spdlog::warn("Field system property: {} not found in meminfo file", fielData.name);
+            if (allValues[fieldData.name].empty()) {
+                spdlog::warn("Field system property: {} not found in meminfo file", fieldData.name);
                 continue;
             }
-            memDataMap[fielData.name] = allValues[fielData.name];
+            memDataMap[fieldData.name] = allValues[fieldData.name];
         }
 
         return memDataMap;
     }
 
-    //TODO:
-    std::unordered_map<string, string> SystemMonitor::parseStatFile(ifstream &statFile) {
+    //TODO: implement read of stat, this function sould return a snapshot of the file with relevant data
+    CpuSnapShot SystemMonitor::parseStatFile(ifstream &statFile) {
         spdlog::info("Parsing stat file");
-        unordered_map<string, string> statDataMap;
+        string line;
+        getline(statFile, line);
+        if (line.empty()) {
+            spdlog::error("Empty line provided");
+            throw ProcessReadError("Empty line read in file");
+        }
 
+        stringstream ss(line);
+        unordered_map<int, string> allValues;
+        unordered_map<string, string> cpuMap;
+        //make a for to extract all values
+        for (int pos = 0; ss >> allValues[pos]; ++pos); //we should have 11 values
 
-        return  statDataMap;
+        //save only values we want
+        for (size_t i = 0; i < types::CPU_FIELD_COUNT; ++i) {
+            const auto &fieldData = types::CPU_FIELDS[i];
+            //check for cpu value and skip
+            if (fieldData.name == "cpu") {
+                spdlog::warn("Skipping cpu string value");
+                continue;
+            }
+            cpuMap[fieldData.name] = allValues[fieldData.pos];
+        }
+
+        //Create snapshot
+        CpuSnapShot snapshot(cpuMap);
+
+        return snapshot;
     }
 
     //TODO:
     void SystemMonitor::refresh() {
-
     }
 
     [[nodiscard]] int SystemMonitor::total_processes() const {
@@ -182,5 +217,4 @@ namespace myProc {
     void SystemMonitor::set_uptime(const uint64_t uptime) {
         this->uptime = uptime;
     }
-
 } // myProc

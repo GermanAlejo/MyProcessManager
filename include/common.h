@@ -10,6 +10,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <cstdint>
 
 namespace myProc::commonLib {
     inline constexpr char processPath[] = "/proc/*/stat";
@@ -24,9 +25,9 @@ namespace myProc::commonLib {
     inline constexpr std::string_view TOTAL_TIME_KEY = "totalTime"; //return as uint64_t
     inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime"; //return as uint64_t
 
-    std::unordered_map<std::string_view, uint64_t> getUptimeData();
+    std::unordered_map<std::string_view, std::uint64_t> getUptimeData();
 
-    std::unordered_map<std::string_view, uint64_t> parseUptimeFile(const std::string &line);
+    std::unordered_map<std::string_view, std::uint64_t> parseUptimeFile(const std::string &line);
 
     enum state {
         R = 'R', //Running

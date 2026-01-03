@@ -11,29 +11,47 @@
 #include <cstdint>
 #include <string>
 
-namespace myProc {
-    class SystemMonitor {
+#include "cpuSnapShot.h"
 
-    /**
-     *  Calculate values in numeric and later in printing get string in %
-     *
-     */
+namespace myProc {
+
+    class SystemMonitor {
+        /**
+         *  Calculate values in numeric and later in printing get string in %
+         *
+         */
     private:
         int totalProcesses{};
+
         //values that can be read
-        unsigned long totalRam{};//in kB
-        unsigned long availableRam{};//in kB
+        unsigned long totalRam{}; //in kB
+        unsigned long availableRam{}; //in kB
         uint64_t uptime{}; //use methods from common
+        //Values to store cpu info
+        CpuSnapShot lastCpuRead;
         //values to compute
         unsigned long usedRam{};
-        double totalCPU{};//cpu usage
+        double totalCPU{}; //cpu usage
 
         void refresh();
+
+        /**
+         * function to read the proc/meminfo file and save the memory info from the file
+         */
         void readMemInfo();
-        std::unordered_map<std::string, std::string> parseMemInfo(std::ifstream &memFile);
+
+        static std::unordered_map<std::string, std::string> parseMemInfo(std::ifstream &memFile);
+
+        /**
+         * function to read the proc/stat file and save the cpu info from the file
+         */
         void readStatFile();
-        std::unordered_map<std::string, std::string> parseStatFile(std::ifstream &statFile);
-        //use this to call commonlib functions
+
+        static CpuSnapShot parseStatFile(std::ifstream &statFile);
+
+        /**
+         * function to read the proc/uptime and save the time usage info from the file
+         */
         void readUpTime();
 
     public:
