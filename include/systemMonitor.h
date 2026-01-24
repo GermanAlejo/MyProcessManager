@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <cstdint>
 #include <string>
+#include <optional>
 
 #include "cpuSnapShot.h"
 
@@ -26,20 +27,25 @@ namespace myProc {
         //values that can be read
         unsigned long totalRam{}; //in kB
         unsigned long availableRam{}; //in kB
+        unsigned long usedRam{};
+        double totalRamGiB;
+        double usedRamGiB;
+        double usedRamPercentage;
         uint64_t uptime{}; //use methods from common
         //Values to store cpu info
-        CpuSnapShot lastCpuRead;
-        //values to compute
-        unsigned long usedRam{};
+        std::optional<CpuSnapShot> lastCpuRead;
         double totalCPU{}; //cpu usage
-
-        void refresh();
 
         /**
          * function to read the proc/meminfo file and save the memory info from the file
          */
         void readMemInfo();
 
+        /**
+         * Maps the file containing the memory information into a map
+         * @param memFile
+         * @return std::unordered_map<std::string, std::string>
+         */
         static std::unordered_map<std::string, std::string> parseMemInfo(std::ifstream &memFile);
 
         /**
@@ -47,6 +53,11 @@ namespace myProc {
          */
         void readStatFile();
 
+        /**
+         * Creates a cpu snapshot
+         * @param statFile
+         * @return CpuSnapShot
+         */
         static CpuSnapShot parseStatFile(std::ifstream &statFile);
 
         /**
@@ -54,8 +65,21 @@ namespace myProc {
          */
         void readUpTime();
 
+        /**
+         * Function to calculate cpu values to represent usage
+         * we will calculate here totalCPU
+         */
+        void calculateTotalCPU(const CpuSnapShot &newSnapShot);
+
+        /**
+         * Calculate ram usage percentage using total_ram and used_ram
+         */
+        void calculateRamFinalValues();
+
     public:
         SystemMonitor();
+
+        void refresh();
 
         [[nodiscard]] int total_processes() const;
 
@@ -64,6 +88,12 @@ namespace myProc {
         [[nodiscard]] unsigned long used_ram() const;
 
         [[nodiscard]] unsigned long available_ram() const;
+
+        [[nodiscard]] double used_ram_gib() const;
+
+        [[nodiscard]] double used_ram_percentage() const;
+
+        [[nodiscard]] double total_ram_gib() const;
 
         [[nodiscard]] double total_cpu() const;
 
@@ -76,6 +106,12 @@ namespace myProc {
         void set_used_ram(unsigned long used_ram);
 
         void set_available_ram(unsigned long available_ram);
+
+        void set_used_ram_gib(double used_ram_gib);
+
+        void set_used_ram_percentage(double used_ram_percentage);
+
+        void set_total_ram_gib(double total_ram_gi_b);
 
         void set_total_cpu(double total_cpu);
 

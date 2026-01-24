@@ -45,6 +45,11 @@ namespace myProc::commonLib {
         I = 'I', //Idle (Linux 4.14 onward)
     };
 
+    /**
+     * Function to wait one second so we can compare system snapshots
+     */
+    void waitOneSecond();
+
     std::string getUptimePath();
 
     std::string getMemInfoPath();

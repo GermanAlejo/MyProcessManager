@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <spdlog/spdlog.h>
+#include<unistd.h>
 
 #include "common.h"
 #include "errors.h"
@@ -11,6 +12,14 @@
 using namespace std;
 
 namespace  myProc::commonLib {
+
+    void waitOneSecond() {
+        spdlog::info("Waiting for a second...");
+        unsigned int microsecond = 1000000;
+        usleep(1 * microsecond);//sleeps for 1 second
+    }
+
+
     unordered_map<string_view, uint64_t> getUptimeData() {
         spdlog::info("Reading uptime file");
         const string path = getUptimePath();

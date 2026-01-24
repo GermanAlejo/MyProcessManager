@@ -46,9 +46,8 @@ namespace myProc {
                 }
             }
 
-            //Now we calculate values
             //calculate used memory
-            set_used_ram(total_ram() - available_ram());
+            calculateRamFinalValues();
 
             memFile.close();
         } catch (ProcessError &err) {
@@ -71,15 +70,17 @@ namespace myProc {
                 throw ProcessFileError("Stat file cannot be opened");
             }
             //Parse file here
-            //TODO: Implement file read into snap shot
-            parseStatFile(statFile);
-
+            if (!this->lastCpuRead.has_value()) {
+                this->lastCpuRead = parseStatFile(statFile);
+            }
             //Wait 1 sec
+            commonLib::waitOneSecond();
 
-            //Check for previous value, if not empty replace
             //Read file second time
+            CpuSnapShot new_snap_shot = parseStatFile(statFile);
 
             //Compare snapshots and calculate cpu% usage
+            calculateTotalCPU(new_snap_shot);
 
             statFile.close();
         } catch (ProcessError &err) {
@@ -133,9 +134,12 @@ namespace myProc {
         return memDataMap;
     }
 
-    //TODO: implement read of stat, this function sould return a snapshot of the file with relevant data
     CpuSnapShot SystemMonitor::parseStatFile(ifstream &statFile) {
         spdlog::info("Parsing stat file");
+        //clear EOF error flags
+        statFile.clear();
+        //move read pointer to start of file
+        statFile.seekg(0);
         string line;
         getline(statFile, line);
         if (line.empty()) {
@@ -159,12 +163,51 @@ namespace myProc {
             }
             cpuMap[fieldData.name] = allValues[fieldData.pos];
         }
-
         //Create snapshot
         CpuSnapShot snapshot(cpuMap);
 
         return snapshot;
     }
+
+    void SystemMonitor::calculateRamFinalValues() {
+        spdlog::info("Calculate RAM usage percentage");
+        const unsigned long ramUsage = total_ram() - available_ram();
+        const double finalRam = static_cast<double>(ramUsage) / static_cast<double>(total_ram());
+        //TODO: Used ram does not work (expects a long not a double)
+        set_used_ram(finalRam);
+        set_used_ram_percentage(finalRam * 100);
+        set_used_ram_gib(ramUsage / (1024 * 1024));
+        //Set total ram as gib
+        set_total_ram_gib(total_ram() / (1024 * 1024));
+    }
+
+    void SystemMonitor::calculateTotalCPU(const CpuSnapShot &newSnapShot) {
+        spdlog::info("Calculating CPU usage");
+        //Subtract previous from current ones
+        const unsigned long prevIdle = lastCpuRead->idle + lastCpuRead->iowait;
+        const unsigned long idle = newSnapShot.idle + newSnapShot.iowait;
+
+        const unsigned long prevNonIdle = lastCpuRead->user + lastCpuRead->nice + lastCpuRead->system + lastCpuRead->softirq +
+            lastCpuRead->irq + lastCpuRead->steal;
+        const unsigned long nonIdle = newSnapShot.user + newSnapShot.nice + newSnapShot.system + newSnapShot.irq +
+            newSnapShot.softirq + newSnapShot.steal;
+
+        const unsigned long prevTotal = prevIdle + prevNonIdle;
+        const unsigned long total = idle + nonIdle;
+
+        // Actual value minus previous one
+        const double totald = static_cast<double>(total) - static_cast<double>(prevTotal);
+        const double idled = static_cast<double>(idle) - static_cast<double>(prevIdle);
+
+        // Calculate percentage
+        double cpu_percentage = (totald - idled) / totald;
+        if (cpu_percentage < 0) {
+            spdlog::warn("CPU usage is 0 - Error calculating usage");
+            cpu_percentage = 0.;
+        }
+        set_total_cpu(cpu_percentage * 100);
+    }
+
 
     //TODO:
     void SystemMonitor::refresh() {
@@ -200,6 +243,30 @@ namespace myProc {
 
     void SystemMonitor::set_available_ram(const unsigned long available_ram) {
         availableRam = available_ram;
+    }
+
+    [[nodiscard]] double SystemMonitor::used_ram_gib() const {
+        return usedRamGiB;
+    }
+
+    void SystemMonitor::set_used_ram_gib(double used_ram_gib) {
+        usedRamGiB = used_ram_gib;
+    }
+
+    [[nodiscard]] double SystemMonitor::used_ram_percentage() const {
+        return usedRamPercentage;
+    }
+
+    void SystemMonitor::set_used_ram_percentage(double used_ram_percentage) {
+        usedRamPercentage = used_ram_percentage;
+    }
+
+    [[nodiscard]] double SystemMonitor::total_ram_gib() const {
+        return totalRamGiB;
+    }
+
+    void SystemMonitor::set_total_ram_gib(double total_ram_gi_b) {
+        totalRamGiB = total_ram_gi_b;
     }
 
     [[nodiscard]] double SystemMonitor::total_cpu() const {
