@@ -6,44 +6,77 @@
 #ifndef MYPROCESSMANAGER_PROCESS_H
 #define MYPROCESSMANAGER_PROCESS_H
 
-#include <map>
-#include <common.h>
-
-using namespace std;
+#include <unordered_map>
+#include <cstdint>
 
 namespace myProc {
     class Process {
     private:
-        int pid{};
-        string fullProcessPath;
-        string name;
-        string state;
-        string utime;//time scheduled in user mode
-        string stime;//time scheduled in kernel mode
-        string startTime;//time process started after boot
+        std::string pid{};
+        //values from stat
+        std::string name;
+        std::string state;
+        std::string utime; //time scheduled in user mode
+        std::string stime; //time scheduled in kernel mode
+        std::string startTime; //time process started after boot
+        //values from status
+        std::string VmRSS; //resident memory
+        std::string VmSize; //virtual memory
 
-        void readStatFile(const string& processName);
-        static map<string, string> parseStatFile(const string& fileLine);
+        void readStatFile(const std::string &processNumber);
+
+        static std::unordered_map<std::string, std::string> parseStatFile(const std::string &fileLine);
+
+        void readStatusFile(const std::string &processNumber);
+
+        static std::unordered_map<std::string, std::string> parseStatusFile(std::ifstream &file);
 
     public:
-        Process(const string& processName);
-        void refresh(string &pidFileName);
+        Process(const std::string &processName);
+
+        //call this function each x seconds to refresh process data
+        void refresh();
+
+        //function to calculate cpu usage
+        double calculateCPU() const;
+
+        //function to calculate memory inMB
+        double calculateMemory() const;
+
         void print() const;
+
         //getters & setters
-        int getPid() const;
-        string getName();
-        string getFullProcessPath();
-        string getState();
-        string getUtime();
-        string getsTime();
-        string getStartTime();
-        void setPid(const int &pid);
-        void setName(const string &name);
-        void setFullProcessPath(const string &path);
-        void setState(const string& state);
-        void setUtime(const string& utime);
-        void setStime(const string& stime);
-        void setStartTime(const string& startTime);
+        std::string getPid() const;
+
+        std::string getName();
+
+        std::string getState();
+
+        unsigned long long getUtime() const;
+
+        unsigned long long getsTime() const;
+
+        uint64_t getStartTime() const;
+
+        unsigned long getVmRSS() const;
+
+        unsigned long getVmSize() const;
+
+        void setPid(const std::string &pid);
+
+        void setName(const std::string &name);
+
+        void setState(const std::string &state);
+
+        void setUtime(const unsigned long long &utime);
+
+        void setStime(const unsigned long long &stime);
+
+        void setStartTime(const uint64_t &startTime);
+
+        void setVmRSS(const unsigned long &vmRss);
+
+        void setVmSize(const unsigned long &VmSize);
     };
 }
 

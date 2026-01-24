@@ -4,36 +4,35 @@
 
 
 #pragma once
-#include <stdexcept>
 
 #ifndef MYPROCESSMANAGER_ERRORS_H
 #define MYPROCESSMANAGER_ERRORS_H
 
-using namespace std;
+#include <stdexcept>
 
-class ProcessError : public runtime_error {
+class ProcessError : public std::runtime_error {
 public:
-    explicit ProcessError(const string& msg);
+    explicit ProcessError(const std::string& msg);
 };
 
 class ProcessFileError : public ProcessError {
 public:
-    explicit ProcessFileError(const string& msg);
+    explicit ProcessFileError(const std::string& msg);
 };
 
 class ProcessNotFound : public ProcessError {
 public:
-    explicit ProcessNotFound(const string& msg);
+    explicit ProcessNotFound(const std::string& msg);
 };
 
 class ProcessAccessDenied : public ProcessError {
 public:
-    explicit ProcessAccessDenied(const string& msg);
+    explicit ProcessAccessDenied(const std::string& msg);
 };
 
 class ProcessReadError : public ProcessError {
 public:
-    explicit ProcessReadError(const string& msg);
+    explicit ProcessReadError(const std::string& msg);
 };
 
 #endif //MYPROCESSMANAGER_ERRORS_H

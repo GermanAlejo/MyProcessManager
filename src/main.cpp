@@ -1,15 +1,19 @@
-#include <iostream>
-#include "../include/process.h"
+
+#include "activeProcesses.h"
+#include "systemMonitor.h"
 
 using namespace myProc;
 
 int main() {
     //Testing
-    Process newProcessTest ("1");
-    //Process newProcessTest2 ("5007");
+    //Process newProcessTest ("1");
+//
+    //newProcessTest.print();
+    //newProcessTest.refresh(newProcessTest.getPid());
+    SystemMonitor m;
 
-    newProcessTest.print();
-    //newProcessTest2.print();
+    ActiveProcesses allProcesses;
+    allProcesses.printProcessContainer();
 
     return 0;
 }
