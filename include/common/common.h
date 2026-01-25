@@ -48,7 +48,7 @@ namespace myProc::commonLib {
     /**
      * Function to wait one second so we can compare system snapshots
      */
-    void waitOneSecond();
+    void waitSomeSeconds(const int seconds);
 
     std::string getUptimePath();
 

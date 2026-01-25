@@ -13,10 +13,10 @@ using namespace std;
 
 namespace  myProc::commonLib {
 
-    void waitOneSecond() {
-        spdlog::info("Waiting for a second...");
-        unsigned int microsecond = 1000000;
-        usleep(1 * microsecond);//sleeps for 1 second
+    void waitSomeSeconds(const int seconds) {
+        spdlog::info("Waiting for {} second...", seconds);
+        constexpr unsigned int microsecond = 1000000;
+        usleep(seconds * microsecond);//sleeps for x seconds
     }
 
 

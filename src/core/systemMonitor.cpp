@@ -74,7 +74,7 @@ namespace myProc {
                 this->lastCpuRead = parseStatFile(statFile);
             }
             //Wait 1 sec
-            commonLib::waitOneSecond();
+            commonLib::waitSomeSeconds(1);
 
             //Read file second time
             CpuSnapShot new_snap_shot = parseStatFile(statFile);
