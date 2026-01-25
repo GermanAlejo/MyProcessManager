@@ -5,10 +5,10 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-#include "../include/common.h"
-#include "../include/process.h"
-#include "../include/errors.h"
-#include "../include/process_types.h"
+#include "../../include/common/common.h"
+#include "../../include/process/process.h"
+#include "../../include/common/errors.h"
+#include "../../include/process/process_types.h"
 
 using namespace std;
 

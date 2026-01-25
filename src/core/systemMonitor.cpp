@@ -5,11 +5,11 @@
 #include <spdlog/spdlog.h>
 #include <fstream>
 
-#include "systemMonitor.h"
-#include "process_types.h"
-#include "cpuSnapShot.h"
-#include "common.h"
-#include "errors.h"
+#include "../../include/core/systemMonitor.h"
+#include "../../include/process/process_types.h"
+#include "../../include/core/cpuSnapShot.h"
+#include "../../include/common/common.h"
+#include "../../include/common/errors.h"
 
 using namespace std;
 

@@ -1,6 +1,6 @@
 
-#include "activeProcesses.h"
-#include "systemMonitor.h"
+#include "../include/core/activeProcesses.h"
+#include "../include/core/systemMonitor.h"
 
 using namespace myProc;
 
