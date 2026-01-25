@@ -6,8 +6,8 @@
 #include <spdlog/spdlog.h>
 #include<unistd.h>
 
-#include "common.h"
-#include "errors.h"
+#include "../../include/common/common.h"
+#include "../../include/common/errors.h"
 
 using namespace std;
 

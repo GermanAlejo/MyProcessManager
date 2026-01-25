@@ -6,10 +6,10 @@
 #include <spdlog/spdlog.h>
 #include <unistd.h>
 
-#include "activeProcesses.h"
-#include "errors.h"
-#include "common.h"
-#include "process.h"
+#include "../../include/core/activeProcesses.h"
+#include "../../include/common/errors.h"
+#include "../../include/common/common.h"
+#include "../../include/process/process.h"
 
 using namespace std;
 

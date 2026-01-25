@@ -7,8 +7,8 @@
 #include <unordered_map>
 #include <spdlog/spdlog.h>
 
-#include "cpuSnapShot.h"
-#include "process_types.h"
+#include "../../include/core/cpuSnapShot.h"
+#include "../../include/process/process_types.h"
 
 using namespace std;
 

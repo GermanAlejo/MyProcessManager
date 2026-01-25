@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 #include <unordered_map>
-#include "process.h"
+#include "../process/process.h"
 
 namespace myProc {
     class ActiveProcesses {

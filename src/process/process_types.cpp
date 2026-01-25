@@ -2,11 +2,11 @@
 // Created by german on 30/11/25.
 //
 
-#include "process_types.h"
-#include "common.h"
-#include "process.h"
-#include "systemMonitor.h"
-#include "cpuSnapShot.h"
+#include "../../include/process/process_types.h"
+#include "../../include/common/common.h"
+#include "../../include/process/process.h"
+#include "../../include/core/systemMonitor.h"
+#include "../../include/core/cpuSnapShot.h"
 
 using namespace std;
 

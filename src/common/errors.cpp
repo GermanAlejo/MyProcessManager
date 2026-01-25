@@ -2,7 +2,7 @@
 // Created by german on 28/11/25.
 //
 
-#include "errors.h"
+#include "../../include/common/errors.h"
 
 using namespace std;
 
