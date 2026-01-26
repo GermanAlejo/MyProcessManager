@@ -36,6 +36,10 @@ namespace myProc {
         std::optional<CpuSnapShot> lastCpuRead;
         double totalCPU{}; //cpu usage
 
+        //TODO: Make method to return uptime in minutes/hours something redable by user
+        //TODO: Make function to return FreeMemory(available) in GiB
+        //TODO: truncate the CPU usage percentage
+
         /**
          * function to read the proc/meminfo file and save the memory info from the file
          */

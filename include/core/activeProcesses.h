@@ -18,14 +18,18 @@ namespace myProc {
     private:
         std::vector<Process> processesVector;
 
-        void refresh() const;
+        //TODO: Ensure the vector is ordered
+        //TODO: Make function to order vector by Memory usage
+
+        static bool isKernelProcess(const std::string& pid);
+        void readProcDir();
     public:
         ActiveProcesses();
 
-        void readProcDir();
+        void refresh() const;
         void printProcessContainer() const;
-
-        static bool isKernelProcess(const std::string& pid);
+        std::vector<Process> get_processes_vector();
+        void set_processes_vector(const std::vector<Process> &processes_vector);
     };
 }
 

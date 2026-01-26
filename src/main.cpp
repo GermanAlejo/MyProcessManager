@@ -1,6 +1,7 @@
 
 #include "../include/core/activeProcesses.h"
 #include "../include/core/systemMonitor.h"
+#include "display/display.h"
 
 using namespace myProc;
 
@@ -10,10 +11,11 @@ int main() {
 //
     //newProcessTest.print();
     //newProcessTest.refresh(newProcessTest.getPid());
-    SystemMonitor m;
+//    SystemMonitor monitor;
 
-    ActiveProcesses allProcesses;
-    allProcesses.printProcessContainer();
-
+  //  ActiveProcesses allProcesses;
+    //allProcesses.printProcessContainer();
+    Display display;
+    display.render();
     return 0;
 }

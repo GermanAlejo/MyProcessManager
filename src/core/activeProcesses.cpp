@@ -84,5 +84,14 @@ namespace myProc {
         return false;
     }
 
+    std::vector<Process> ActiveProcesses::get_processes_vector() {
+        return processesVector;
+    }
+
+    void ActiveProcesses::set_processes_vector(const std::vector<Process> &processes_vector) {
+        processesVector = processes_vector;
+    }
+
+
 
 }
