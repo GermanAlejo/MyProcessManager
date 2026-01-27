@@ -12,15 +12,14 @@ using namespace std;
 
 namespace myProc {
 
-    Display::Display() {
-        //Set up private variables
-        current_active_processes = ActiveProcesses();
-        current_system_monitor = SystemMonitor();
+    Display::Display(SystemMonitor &system_monitor, ActiveProcesses &active_processes) : current_active_processes(active_processes),
+        current_system_monitor(system_monitor) {
         //Set up console output
         console = spdlog::get("console");
         if (!console) {
             console = spdlog::stdout_color_mt("console");
-            std::shared_ptr<spdlog::sinks::stderr_color_sink_mt> sink = std::static_pointer_cast<spdlog::sinks::stderr_color_sink_mt>(console->sinks()[0]);
+            std::shared_ptr<spdlog::sinks::stderr_color_sink_mt> sink = std::static_pointer_cast<
+                spdlog::sinks::stderr_color_sink_mt>(console->sinks()[0]);
             sink->set_color(spdlog::level::info, sink->green);
             console->set_pattern("%^%v%$");
         }

@@ -17,7 +17,7 @@ namespace myProc {
         /**
          * Constructor, initializes the Monitor anc process container
          */
-        Display();
+        Display(SystemMonitor& system_monitor, ActiveProcesses& active_processes);
 
         /**
          * Main render method to call in main
@@ -28,8 +28,8 @@ namespace myProc {
         //Logger
         std::shared_ptr<spdlog::logger> console;
         //Processes & Monitor
-        ActiveProcesses current_active_processes;
-        SystemMonitor current_system_monitor;
+        ActiveProcesses& current_active_processes;
+        SystemMonitor& current_system_monitor;
 
         /**
          * Outputs the Global system metrics
