@@ -18,6 +18,8 @@ namespace myProc {
         spdlog::info("Creating new process with pid: {}", processName);
         readStatFile(processName);
         readStatusFile(processName);
+        calculateMemory();
+        calculateCPU();
     }
 
     //Private methods
@@ -51,7 +53,6 @@ namespace myProc {
                     meta.setter(*this, it->second); // Apply the setter lambda
                 }
             }
-
             pidFile.close();
         } catch (ProcessError &e) {
             spdlog::error("Process error: {}", e.what());
@@ -112,7 +113,6 @@ namespace myProc {
             const auto &fieldData = types::LINE_FIELDS[i];
             processesMap[fieldData.name] = allValues[fieldData.pos];
         }
-
         return processesMap;
     }
 
@@ -150,30 +150,37 @@ namespace myProc {
     void Process::refresh() {
         spdlog::info("REFRESHING - {}", pid);
         readStatFile(pid);
-        double cpu = calculateCPU();
-        double ram = calculateMemory();
-        //TODO: replace this print cpu in %
-        spdlog::info("CPU: {} | Memory: {} MB", cpu, ram);
+        readStatusFile(pid);
+        calculateCPU();
+        calculateMemory();
     }
 
-    double Process::calculateCPU() const {
+    //TODO: Fix CPU calculation
+    void Process::calculateCPU() {
         //TODO: Implement error catching here
         spdlog::info("Calculating CPU usage for: {}", getPid());
         unordered_map<string_view, uint64_t> timeMap = commonLib::getUptimeData();
         const uint64_t systemUpTime = timeMap[commonLib::TOTAL_TIME_KEY]; //total up time in seconds
-        long ticks = sysconf(_SC_CLK_TCK); //Clock ticks per second (usually 100 on Linux)
-        long totalTime = getUtime() + getsTime(); //total process time
+        const long ticks = sysconf(_SC_CLK_TCK); //Clock ticks per second (usually 100 on Linux)
+        const long totalTime = getUtime() + getsTime(); //total process time
         //Convert process total time to seconds
-        double seconds = totalTime / ticks; //this should stay as double
+        const double seconds = totalTime / ticks; //this should stay as double
         //how long the process has been running in sec
-        double processUpTime = systemUpTime - (getStartTime() / ticks);
+        const double processUpTime = systemUpTime - (getStartTime() / ticks);
         double cpuUsage = seconds / processUpTime;
-        return cpuUsage * 100;//TODO: Calcula % properly and trunk
+        if (cpuUsage < 0) {
+            spdlog::warn("CPU usage is 0 - Error calculating usage");
+            cpuUsage = 0.;
+        }
+        cpuUsage *= 100;
+        set_cpu_usage(round(cpuUsage));
     }
 
-    double Process::calculateMemory() const {
-        //TODO: check this conversion
-        return getVmRSS() / 1024.0;
+    //TODO:Fix Memory calculation
+    void Process::calculateMemory() {
+        spdlog::info("Calculating GiB memory usage");
+        set_vm_rss_gib(static_cast<double>(getVmRSS()) / (1024 * 1024));
+        set_vm_size_gib(static_cast<double>(getVmSize()) / (1024 * 1024));
     }
 
     void Process::print() const {
@@ -196,7 +203,7 @@ namespace myProc {
         this->pid = pid;
     }
 
-    string Process::getName() {
+    string Process::getName() const {
         return this->name;
     }
 
@@ -204,7 +211,7 @@ namespace myProc {
         this->name = name;
     }
 
-    string Process::getState() {
+    string Process::getState() const {
         return this->state;
     }
 
@@ -251,4 +258,29 @@ namespace myProc {
     void Process::setVmSize(const unsigned long &VmSize) {
         this->VmSize = to_string(VmSize);
     }
+
+    double Process::vm_rss_gib() const {
+        return VmRSSGiB;
+    }
+
+    void Process::set_vm_rss_gib(const double &vm_rss_gib) {
+        VmRSSGiB = vm_rss_gib;
+    }
+
+    double Process::vm_size_gib() const {
+        return VmSizeGiB;
+    }
+
+    void Process::set_vm_size_gib(const double &vm_size_gib) {
+        VmSizeGiB = vm_size_gib;
+    }
+
+    double Process::get_cpu_usage() const {
+        return cpu_usage;
+    }
+
+    void Process::set_cpu_usage(const double &cpu_usage) {
+        this->cpu_usage = cpu_usage;
+    }
+
 }

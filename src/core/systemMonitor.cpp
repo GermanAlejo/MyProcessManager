@@ -173,8 +173,8 @@ namespace myProc {
         spdlog::info("Calculate RAM usage percentage");
         const unsigned long ramUsage = total_ram() - available_ram();
         const double finalRam = static_cast<double>(ramUsage) / static_cast<double>(total_ram());
-        //TODO: Used ram does not work (expects a long not a double)
-        set_used_ram(finalRam);
+        //Used ram does not work (expects a long not a double)
+        set_used_ram(ramUsage);
         set_used_ram_percentage(finalRam * 100);
         set_used_ram_gib(ramUsage / (1024 * 1024));
         //Set total ram as gib
@@ -205,12 +205,16 @@ namespace myProc {
             spdlog::warn("CPU usage is 0 - Error calculating usage");
             cpu_percentage = 0.;
         }
-        set_total_cpu(cpu_percentage * 100);
+        cpu_percentage *= 100;
+        set_total_cpu(round(cpu_percentage * 100.) / 100.); //Round with 2 digits
     }
 
 
-    //TODO:
     void SystemMonitor::refresh() {
+        spdlog::info("Refreshing System Monitor");
+        readMemInfo();
+        readUpTime();
+        readStatFile();
     }
 
     [[nodiscard]] int SystemMonitor::total_processes() const {

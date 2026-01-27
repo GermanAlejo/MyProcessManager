@@ -34,22 +34,24 @@ namespace myProc {
     }
 
     void Display::renderSystemMetrics() const {
-        console->info("CPU: {} | Total Memory: {} | Memory Used: {} | Free Memory:  {} | Uptime: {}",
+        console->info("CPU: {}% | Total Memory: {}GiB | Memory Used: {}GiB | Free Memory:  {}GiB | Uptime: {} minutes | Number Processes: {}",
             current_system_monitor.total_cpu(),
             current_system_monitor.total_ram_gib(),
             current_system_monitor.used_ram_gib(),
             current_system_monitor.available_ram(),
-            current_system_monitor.get_uptime());
+            current_system_monitor.get_uptime(),
+            current_system_monitor.total_processes());
     }
 
     void Display::renderProcessesList() {
-        for (Process process : current_active_processes.get_processes_vector()) {
-            console->info("PID: {} | {} | State: {} | Virtual Mem: {} | Resident Memory: {} | Time Running: {}",
+        for (const Process& process : current_active_processes.get_processes_vector()) {
+            console->info("PID: {} | {} | State: {} | CPU: {} | Virtual Mem: {} | Resident Memory: {} | Time Running: {}",
                 process.getPid(),
                 process.getName(),
                 process.getState(),
-                process.getVmSize(),
-                process.getVmRSS(),
+                process.get_cpu_usage(),
+                process.vm_rss_gib(),
+                process.vm_size_gib(),
                 process.getUtime());
         }
     }

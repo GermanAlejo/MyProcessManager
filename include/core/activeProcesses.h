@@ -8,9 +8,7 @@
 #define MYPROCESSMANAGER_ACTIVEPROCESSES_H
 
 #include <string>
-#include <string_view>
 #include <vector>
-#include <unordered_map>
 #include "../process/process.h"
 
 namespace myProc {
@@ -26,7 +24,7 @@ namespace myProc {
     public:
         ActiveProcesses();
 
-        void refresh() const;
+        void refresh();
         void printProcessContainer() const;
         std::vector<Process> get_processes_vector();
         void set_processes_vector(const std::vector<Process> &processes_vector);

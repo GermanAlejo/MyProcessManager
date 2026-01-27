@@ -19,9 +19,10 @@ namespace myProc {
         readProcDir();
     }
 
-    void ActiveProcesses::refresh() const {
+    void ActiveProcesses::refresh() {
         try {
             spdlog::info("Refreshing process container");
+            readProcDir();
             for (Process p : processesVector) {
                 p.refresh();
             }

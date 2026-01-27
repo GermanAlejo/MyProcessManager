@@ -38,7 +38,6 @@ namespace myProc {
 
         //TODO: Make method to return uptime in minutes/hours something redable by user
         //TODO: Make function to return FreeMemory(available) in GiB
-        //TODO: truncate the CPU usage percentage
 
         /**
          * function to read the proc/meminfo file and save the memory info from the file
@@ -83,6 +82,9 @@ namespace myProc {
     public:
         SystemMonitor();
 
+        /**
+         *
+         */
         void refresh();
 
         [[nodiscard]] int total_processes() const;

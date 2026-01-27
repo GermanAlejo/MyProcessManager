@@ -15,9 +15,7 @@ namespace myProc {
     class Display {
     public:
         /**
-         * Constructor
-         * @param active_processes
-         * @param system_monitor
+         * Constructor, initializes the Monitor anc process container
          */
         Display();
 
@@ -26,26 +24,29 @@ namespace myProc {
          */
         void render();
 
-        void testRender();
-
     private:
-
         //Logger
         std::shared_ptr<spdlog::logger> console;
         //Processes & Monitor
         ActiveProcesses current_active_processes;
         SystemMonitor current_system_monitor;
 
-        //TODO: render System metrics (CPU, Memory, etc...)
+        /**
+         * Outputs the Global system metrics
+         */
         void renderSystemMetrics() const;
 
         //TODO: render Process List
         void renderProcessesList();
 
-        //TODO: Render header
+        /**
+         * Outputs the Header of the manager
+         */
         void renderHeader() const;
 
-        //TODO: Render footer
+        /**
+         * Outputs the footer of the Manager
+         */
         void renderFooter() const;
     };
 }
