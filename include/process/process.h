@@ -16,12 +16,15 @@ namespace myProc {
         //values from stat
         std::string name;
         std::string state;
-        std::string utime; //time scheduled in user mode
-        std::string stime; //time scheduled in kernel mode
+        std::string utime; //time scheduled in user mode (CPU ticks)
+        std::string stime; //time scheduled in kernel mode (CPU ticks)
         std::string startTime; //time process started after boot
         //values from status
         std::string VmRSS; //resident memory
+        double VmRSSGiB;
         std::string VmSize; //virtual memory
+        double VmSizeGiB;
+        double cpu_usage;
 
         void readStatFile(const std::string &processNumber);
 
@@ -32,35 +35,35 @@ namespace myProc {
         static std::unordered_map<std::string, std::string> parseStatusFile(std::ifstream &file);
 
     public:
-        Process(const std::string &processName);
+        Process(const std::string &processName, const uint64_t systemUpTime);
 
         //call this function each x seconds to refresh process data
-        void refresh();
+        void refresh(const uint64_t &systemUpTime);
 
         //function to calculate cpu usage
-        double calculateCPU() const;
+        void calculateCPU(const uint64_t &systemUpTime);
 
         //function to calculate memory inMB
-        double calculateMemory() const;
+        void calculateMemory();
 
         void print() const;
 
         //getters & setters
-        std::string getPid() const;
+        [[nodiscard]] std::string getPid() const;
 
-        std::string getName();
+        [[nodiscard]] std::string getName() const;
 
-        std::string getState();
+        [[nodiscard]] std::string getState() const;
 
-        unsigned long long getUtime() const;
+        [[nodiscard]] unsigned long long getUtime() const;
 
-        unsigned long long getsTime() const;
+        [[nodiscard]] unsigned long long getsTime() const;
 
-        uint64_t getStartTime() const;
+        [[nodiscard]] uint64_t getStartTime() const;
 
-        unsigned long getVmRSS() const;
+        [[nodiscard]] unsigned long getVmRSS() const;
 
-        unsigned long getVmSize() const;
+        [[nodiscard]] unsigned long getVmSize() const;
 
         void setPid(const std::string &pid);
 
@@ -77,6 +80,20 @@ namespace myProc {
         void setVmRSS(const unsigned long &vmRss);
 
         void setVmSize(const unsigned long &VmSize);
+
+        [[nodiscard]] double vm_rss_mib() const;
+
+        void set_vm_rss_mib(const double &vm_rss_gib);
+
+        [[nodiscard]] double vm_size_mib() const;
+
+        void set_vm_size_mib(const double &vm_size_gib);
+
+        [[nodiscard]] double get_cpu_usage() const;
+
+        void set_cpu_usage(const double &cpu_usage);
+
+        long getElapsedSeconds(const uint64_t systemUpTime) const;
     };
 }
 

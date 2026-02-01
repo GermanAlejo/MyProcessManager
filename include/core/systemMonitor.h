@@ -23,18 +23,19 @@ namespace myProc {
          */
     private:
         int totalProcesses{};
-
         //values that can be read
         unsigned long totalRam{}; //in kB
         unsigned long availableRam{}; //in kB
         unsigned long usedRam{};
         double totalRamGiB;
         double usedRamGiB;
+        double availableRamGiB;
         double usedRamPercentage;
         uint64_t uptime{}; //use methods from common
         //Values to store cpu info
         std::optional<CpuSnapShot> lastCpuRead;
         double totalCPU{}; //cpu usage
+        //TODO: Make function to return FreeMemory(available) in GiB
 
         /**
          * function to read the proc/meminfo file and save the memory info from the file
@@ -79,6 +80,9 @@ namespace myProc {
     public:
         SystemMonitor();
 
+        /**
+         *
+         */
         void refresh();
 
         [[nodiscard]] int total_processes() const;
@@ -94,6 +98,8 @@ namespace myProc {
         [[nodiscard]] double used_ram_percentage() const;
 
         [[nodiscard]] double total_ram_gib() const;
+
+        [[nodiscard]] double available_ram_gib() const;
 
         [[nodiscard]] double total_cpu() const;
 
@@ -111,7 +117,9 @@ namespace myProc {
 
         void set_used_ram_percentage(double used_ram_percentage);
 
-        void set_total_ram_gib(double total_ram_gi_b);
+        void set_total_ram_gib(double total_ram_gib);
+
+        void set_available_ram_gib(double available_ram_gib);
 
         void set_total_cpu(double total_cpu);
 

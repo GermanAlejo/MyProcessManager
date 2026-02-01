@@ -14,16 +14,18 @@
 using namespace std;
 
 namespace myProc {
-    ActiveProcesses::ActiveProcesses() {
+    ActiveProcesses::ActiveProcesses(const uint64_t &totalUpTime) {
         spdlog::info("Creating process container");
+        systemUpTime = totalUpTime;
         readProcDir();
     }
 
-    void ActiveProcesses::refresh() const {
+    void ActiveProcesses::refresh() {
         try {
             spdlog::info("Refreshing process container");
+            readProcDir();
             for (Process p : processesVector) {
-                p.refresh();
+                p.refresh(systemUpTime);
             }
         } catch (ProcessError &err) {
             spdlog::error("Error refreshing - {}", err.what());
@@ -52,7 +54,7 @@ namespace myProc {
                     spdlog::warn("Skipping kernel process with name: {}", processName);
                     continue;
                 }
-                Process newProcess(processName);
+                Process newProcess(processName, systemUpTime);
                 processesVector.push_back(newProcess);
             }
         } catch (ProcessError &err) {
@@ -83,6 +85,15 @@ namespace myProc {
         }
         return false;
     }
+
+    std::vector<Process> ActiveProcesses::get_processes_vector() {
+        return processesVector;
+    }
+
+    void ActiveProcesses::set_processes_vector(const std::vector<Process> &processes_vector) {
+        processesVector = processes_vector;
+    }
+
 
 
 }

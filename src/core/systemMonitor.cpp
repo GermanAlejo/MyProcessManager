@@ -74,7 +74,7 @@ namespace myProc {
                 this->lastCpuRead = parseStatFile(statFile);
             }
             //Wait 1 sec
-            commonLib::waitOneSecond();
+            commonLib::waitSomeSeconds(1);
 
             //Read file second time
             CpuSnapShot new_snap_shot = parseStatFile(statFile);
@@ -173,12 +173,14 @@ namespace myProc {
         spdlog::info("Calculate RAM usage percentage");
         const unsigned long ramUsage = total_ram() - available_ram();
         const double finalRam = static_cast<double>(ramUsage) / static_cast<double>(total_ram());
-        //TODO: Used ram does not work (expects a long not a double)
-        set_used_ram(finalRam);
+        //Used ram does not work (expects a long not a double)
+        set_used_ram(ramUsage);
         set_used_ram_percentage(finalRam * 100);
         set_used_ram_gib(ramUsage / (1024 * 1024));
         //Set total ram as gib
         set_total_ram_gib(total_ram() / (1024 * 1024));
+        //set available ram as gib
+        set_available_ram_gib(available_ram() / (1024 * 1024));
     }
 
     void SystemMonitor::calculateTotalCPU(const CpuSnapShot &newSnapShot) {
@@ -205,12 +207,16 @@ namespace myProc {
             spdlog::warn("CPU usage is 0 - Error calculating usage");
             cpu_percentage = 0.;
         }
-        set_total_cpu(cpu_percentage * 100);
+        cpu_percentage *= 100;
+        set_total_cpu(round(cpu_percentage * 100.) / 100.); //Round with 2 digits
     }
 
 
-    //TODO:
     void SystemMonitor::refresh() {
+        spdlog::info("Refreshing System Monitor");
+        readMemInfo();
+        readUpTime();
+        readStatFile();
     }
 
     [[nodiscard]] int SystemMonitor::total_processes() const {
@@ -283,5 +289,15 @@ namespace myProc {
 
     void SystemMonitor::set_uptime(const uint64_t uptime) {
         this->uptime = uptime;
+    }
+
+
+    [[nodiscard]] double SystemMonitor::available_ram_gib() const {
+        return availableRamGiB;
+    }
+
+
+    void SystemMonitor::set_available_ram_gib(const double available_ram_gib) {
+        this->availableRamGiB = available_ram_gib;
     }
 } // myProc

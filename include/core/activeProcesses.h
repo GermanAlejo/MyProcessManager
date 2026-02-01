@@ -8,24 +8,27 @@
 #define MYPROCESSMANAGER_ACTIVEPROCESSES_H
 
 #include <string>
-#include <string_view>
 #include <vector>
-#include <unordered_map>
 #include "../process/process.h"
 
 namespace myProc {
     class ActiveProcesses {
     private:
         std::vector<Process> processesVector;
+        uint64_t systemUpTime;
 
-        void refresh() const;
-    public:
-        ActiveProcesses();
-
-        void readProcDir();
-        void printProcessContainer() const;
+        //TODO: Ensure the vector is ordered
+        //TODO: Make function to order vector by Memory usage
 
         static bool isKernelProcess(const std::string& pid);
+        void readProcDir();
+    public:
+        explicit ActiveProcesses(const uint64_t &totalUpTime);
+
+        void refresh();
+        void printProcessContainer() const;
+        std::vector<Process> get_processes_vector();
+        void set_processes_vector(const std::vector<Process> &processes_vector);
     };
 }
 

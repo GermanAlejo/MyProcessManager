@@ -13,10 +13,10 @@ using namespace std;
 
 namespace  myProc::commonLib {
 
-    void waitOneSecond() {
-        spdlog::info("Waiting for a second...");
-        unsigned int microsecond = 1000000;
-        usleep(1 * microsecond);//sleeps for 1 second
+    void waitSomeSeconds(const int seconds) {
+        spdlog::info("Waiting for {} second...", seconds);
+        constexpr unsigned int microsecond = 1000000;
+        usleep(seconds * microsecond);//sleeps for x seconds
     }
 
 
@@ -51,9 +51,11 @@ namespace  myProc::commonLib {
         //get stream from line and parse it
         stringstream ss(line);
         unordered_map<string_view, uint64_t> uptimeMap;
-        //extract direcly as is always 2 values
-        //make a for to extract all values
-        ss >> uptimeMap[TOTAL_TIME_KEY] >> uptimeMap[TOTAL_IDLE_KEY];
+        //extract as double first (since /proc/uptime has decimals), then convert to uint64_t
+        double totalTime, totalIdle;
+        ss >> totalTime >> totalIdle;
+        uptimeMap[TOTAL_TIME_KEY] = static_cast<uint64_t>(totalTime);
+        uptimeMap[TOTAL_IDLE_KEY] = static_cast<uint64_t>(totalIdle);
         return uptimeMap;
     }
 
@@ -96,7 +98,7 @@ namespace  myProc::commonLib {
         return procBase + pid + statPath;
     }
 
-    std::string getMemInfoPath() {
+    string getMemInfoPath() {
         return string(procBase) + string(memInfoPath);
     }
 
@@ -108,7 +110,7 @@ namespace  myProc::commonLib {
         return string(procBase) + string(uptimePath);
     }
 
-    std::string getExecutablePath(const std::string &pid) {
+    string getExecutablePath(const string &pid) {
         return string(procBase) + pid + string(executablePath);
     }
 
@@ -125,11 +127,31 @@ namespace  myProc::commonLib {
         return result;
     }
 
-    bool isNumber(const std::string &str) {
+    bool isNumber(const string &str) {
         for (const char &c : str) {
             if (isdigit(c) == 0) return false;
         }
         return true;
     }
+
+    string displayMemory(const double memoryValue) {
+        //check if we surpass the MiB value
+        if (memoryValue >= 1024) {
+            //Truncate the decimals to 2 and divide 1024 so we get GiB properly
+            const double resVal = trunc((memoryValue / 1024) * 100.) / 100.;
+            //Clean all extra 0s
+            return cleanZerosFromString(resVal) + " GiB";
+        }
+        const double resVal = trunc(memoryValue * 100.) / 100.;
+        //Clean all extra 0s
+        return cleanZerosFromString(resVal) + " MiB";
+    }
+
+    std::string cleanZerosFromString(const double value) {
+        ostringstream oss;
+        oss << value;
+        return oss.str();
+    }
+
 
 }
