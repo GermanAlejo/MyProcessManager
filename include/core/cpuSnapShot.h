@@ -42,8 +42,9 @@ namespace myProc {
          * @param guest 9 - Time spent running a virtual CPU for guest OS
          * @param guestNice 10 - Time spent running a nice guest
          */
-        CpuSnapShot(const std::string &user, const std::string &nice, const std::string &system,
-
+        CpuSnapShot(const std::string &user,
+                    const std::string &nice,
+                    const std::string &system,
                     const std::string &idle,
                     const std::string &iowait,
                     const std::string &irq,

@@ -15,6 +15,7 @@ namespace myProc {
     class ActiveProcesses {
     private:
         std::vector<Process> processesVector;
+        uint64_t systemUpTime;
 
         //TODO: Ensure the vector is ordered
         //TODO: Make function to order vector by Memory usage
@@ -22,7 +23,7 @@ namespace myProc {
         static bool isKernelProcess(const std::string& pid);
         void readProcDir();
     public:
-        ActiveProcesses();
+        explicit ActiveProcesses(const uint64_t &totalUpTime);
 
         void refresh();
         void printProcessContainer() const;

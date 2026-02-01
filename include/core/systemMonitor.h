@@ -23,20 +23,18 @@ namespace myProc {
          */
     private:
         int totalProcesses{};
-
         //values that can be read
         unsigned long totalRam{}; //in kB
         unsigned long availableRam{}; //in kB
         unsigned long usedRam{};
         double totalRamGiB;
         double usedRamGiB;
+        double availableRamGiB;
         double usedRamPercentage;
         uint64_t uptime{}; //use methods from common
         //Values to store cpu info
         std::optional<CpuSnapShot> lastCpuRead;
         double totalCPU{}; //cpu usage
-
-        //TODO: Make method to return uptime in minutes/hours something redable by user
         //TODO: Make function to return FreeMemory(available) in GiB
 
         /**
@@ -101,6 +99,8 @@ namespace myProc {
 
         [[nodiscard]] double total_ram_gib() const;
 
+        [[nodiscard]] double available_ram_gib() const;
+
         [[nodiscard]] double total_cpu() const;
 
         [[nodiscard]] uint64_t get_uptime() const;
@@ -117,7 +117,9 @@ namespace myProc {
 
         void set_used_ram_percentage(double used_ram_percentage);
 
-        void set_total_ram_gib(double total_ram_gi_b);
+        void set_total_ram_gib(double total_ram_gib);
+
+        void set_available_ram_gib(double available_ram_gib);
 
         void set_total_cpu(double total_cpu);
 

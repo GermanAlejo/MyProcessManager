@@ -14,12 +14,12 @@ using namespace std;
 
 namespace myProc {
     //Constructors
-    Process::Process(const string &processName) {
+    Process::Process(const string &processName, const uint64_t systemUpTime) {
         spdlog::info("Creating new process with pid: {}", processName);
         readStatFile(processName);
         readStatusFile(processName);
         calculateMemory();
-        calculateCPU();
+        calculateCPU(systemUpTime);
     }
 
     //Private methods
@@ -147,41 +147,44 @@ namespace myProc {
     }
 
     //public methods
-    void Process::refresh() {
+    void Process::refresh(const uint64_t &systemUpTime) {
         spdlog::info("REFRESHING - {}", pid);
         readStatFile(pid);
         readStatusFile(pid);
-        calculateCPU();
+        calculateCPU(systemUpTime);
         calculateMemory();
     }
 
-    //TODO: Fix CPU calculation
-    void Process::calculateCPU() {
+    void Process::calculateCPU(const uint64_t &systemUpTime) {
         //TODO: Implement error catching here
         spdlog::info("Calculating CPU usage for: {}", getPid());
-        unordered_map<string_view, uint64_t> timeMap = commonLib::getUptimeData();
-        const uint64_t systemUpTime = timeMap[commonLib::TOTAL_TIME_KEY]; //total up time in seconds
         const long ticks = sysconf(_SC_CLK_TCK); //Clock ticks per second (usually 100 on Linux)
         const long totalTime = getUtime() + getsTime(); //total process time
         //Convert process total time to seconds
         const double seconds = totalTime / ticks; //this should stay as double
         //how long the process has been running in sec
         const double processUpTime = systemUpTime - (getStartTime() / ticks);
-        double cpuUsage = seconds / processUpTime;
+
+        const int numCores = sysconf(_SC_NPROCESSORS_ONLN);
+        double cpuUsage = (seconds / processUpTime) / numCores * 100;
         if (cpuUsage < 0) {
             spdlog::warn("CPU usage is 0 - Error calculating usage");
             cpuUsage = 0.;
         }
-        cpuUsage *= 100;
-        set_cpu_usage(round(cpuUsage));
+        set_cpu_usage(cpuUsage);
     }
 
-    //TODO:Fix Memory calculation
     void Process::calculateMemory() {
-        spdlog::info("Calculating GiB memory usage");
-        set_vm_rss_gib(static_cast<double>(getVmRSS()) / (1024 * 1024));
-        set_vm_size_gib(static_cast<double>(getVmSize()) / (1024 * 1024));
+        spdlog::info("Calculating MiB memory usage");
+        set_vm_rss_mib(static_cast<double>(getVmRSS()) / 1024);
+        set_vm_size_mib(static_cast<double>(getVmSize()) / 1024);
     }
+
+    long Process::getElapsedSeconds(const uint64_t systemUpTime) const {
+        const long ticks = sysconf(_SC_CLK_TCK);
+        return (systemUpTime - (getStartTime() / ticks));
+    }
+
 
     void Process::print() const {
         cout << "PID: \t\t\t" << pid << "\n" <<
@@ -259,19 +262,19 @@ namespace myProc {
         this->VmSize = to_string(VmSize);
     }
 
-    double Process::vm_rss_gib() const {
+    double Process::vm_rss_mib() const {
         return VmRSSGiB;
     }
 
-    void Process::set_vm_rss_gib(const double &vm_rss_gib) {
+    void Process::set_vm_rss_mib(const double &vm_rss_gib) {
         VmRSSGiB = vm_rss_gib;
     }
 
-    double Process::vm_size_gib() const {
+    double Process::vm_size_mib() const {
         return VmSizeGiB;
     }
 
-    void Process::set_vm_size_gib(const double &vm_size_gib) {
+    void Process::set_vm_size_mib(const double &vm_size_gib) {
         VmSizeGiB = vm_size_gib;
     }
 

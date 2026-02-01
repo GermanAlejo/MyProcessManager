@@ -36,7 +36,6 @@ namespace myProc {
          */
         void renderSystemMetrics() const;
 
-        //TODO: render Process List
         void renderProcessesList();
 
         /**

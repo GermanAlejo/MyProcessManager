@@ -7,12 +7,13 @@
 #include <chrono>
 
 #include "display/display.h"
+#include "common/common.h"
 
 using namespace std;
 
 namespace myProc {
-
-    Display::Display(SystemMonitor &system_monitor, ActiveProcesses &active_processes) : current_active_processes(active_processes),
+    Display::Display(SystemMonitor &system_monitor, ActiveProcesses &active_processes) : current_active_processes(
+            active_processes),
         current_system_monitor(system_monitor) {
         //Set up console output
         console = spdlog::get("console");
@@ -33,37 +34,41 @@ namespace myProc {
     }
 
     void Display::renderSystemMetrics() const {
-        console->info("CPU: {}% | Total Memory: {}GiB | Memory Used: {}GiB | Free Memory:  {}GiB | Uptime: {} minutes | Number Processes: {}",
+        const long seconds = current_system_monitor.get_uptime();
+        console->info(
+            "CPU: {}% | Total Memory: {}GiB | Memory Used: {}GiB | Free Memory:  {}GiB | Uptime: {}h {}m {}s | Number Processes: {}",
             current_system_monitor.total_cpu(),
             current_system_monitor.total_ram_gib(),
             current_system_monitor.used_ram_gib(),
-            current_system_monitor.available_ram(),
-            current_system_monitor.get_uptime(),
+            current_system_monitor.available_ram_gib(),
+            seconds / 3600,
+            (seconds % 3600) / 60,
+            seconds % 60,
             current_system_monitor.total_processes());
     }
 
     void Display::renderProcessesList() {
-        for (const Process& process : current_active_processes.get_processes_vector()) {
-            console->info("PID: {} | {} | State: {} | CPU: {} | Virtual Mem: {} | Resident Memory: {} | Time Running: {}",
+        for (const Process &process: current_active_processes.get_processes_vector()) {
+            long seconds = process.getElapsedSeconds(current_system_monitor.get_uptime());
+            console->info(
+                "PID: {} | {} | State: {} | CPU: {:.2f}% | Resident Memory: {} | Time Running: {}h {}m {}s",
                 process.getPid(),
                 process.getName(),
                 process.getState(),
                 process.get_cpu_usage(),
-                process.vm_rss_gib(),
-                process.vm_size_gib(),
-                process.getUtime());
+                commonLib::displayMemory(process.vm_rss_mib()),
+                seconds / 3600,
+                (seconds % 3600) / 60,
+                seconds % 60);
         }
     }
 
     void Display::renderHeader() const {
         auto today = std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now());
-        console->info("====== My Process Manager - {} ======", format("{}", today));
+        console->info("\n\n====== My Process Manager - {} ======", format("{}", today));
     }
 
     void Display::renderFooter() const {
-        console->info("=================================");
+        console->info("=================================\n\n");
     }
-
-
-
 }

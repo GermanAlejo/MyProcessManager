@@ -179,6 +179,8 @@ namespace myProc {
         set_used_ram_gib(ramUsage / (1024 * 1024));
         //Set total ram as gib
         set_total_ram_gib(total_ram() / (1024 * 1024));
+        //set available ram as gib
+        set_available_ram_gib(available_ram() / (1024 * 1024));
     }
 
     void SystemMonitor::calculateTotalCPU(const CpuSnapShot &newSnapShot) {
@@ -287,5 +289,15 @@ namespace myProc {
 
     void SystemMonitor::set_uptime(const uint64_t uptime) {
         this->uptime = uptime;
+    }
+
+
+    [[nodiscard]] double SystemMonitor::available_ram_gib() const {
+        return availableRamGiB;
+    }
+
+
+    void SystemMonitor::set_available_ram_gib(const double available_ram_gib) {
+        this->availableRamGiB = available_ram_gib;
     }
 } // myProc

@@ -65,6 +65,20 @@ namespace myProc::commonLib {
     std::vector<std::string> splitStringByChar(const std::string &lineString, const char &delimiter);
 
     bool isNumber(const std::string &str);
+
+    /**
+     * This functions should convert and show the memory in GiB when we reach 1 GiB of use
+     * and MiB when we don't
+     * @return memory converted in string
+     */
+    std::string displayMemory(double memoryValue);
+
+    /**
+     * function to clean remaining 0s after truncating/rounding a number to cast to string
+     * @param value
+     * @return
+     */
+    std::string cleanZerosFromString(double value);
 }
 
 #endif //MYPROCESSMANAGER_COMMON_H
