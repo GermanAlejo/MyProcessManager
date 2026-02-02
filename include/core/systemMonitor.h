@@ -35,7 +35,6 @@ namespace myProc {
         //Values to store cpu info
         std::optional<CpuSnapShot> lastCpuRead;
         double totalCPU{}; //cpu usage
-        //TODO: Make function to return FreeMemory(available) in GiB
 
         /**
          * function to read the proc/meminfo file and save the memory info from the file
