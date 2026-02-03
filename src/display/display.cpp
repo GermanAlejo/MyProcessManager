@@ -5,32 +5,29 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <chrono>
+#include <csignal>
 
 #include "display/display.h"
+
+#include <iostream>
+
 #include "common/common.h"
 
 using namespace std;
 
 namespace myProc {
-    Display::Display(SystemMonitor &system_monitor, ActiveProcesses &active_processes) : current_active_processes(
+    Display::Display(SystemMonitor &system_monitor, ActiveProcesses &active_processes, const bool &active_logs) : current_active_processes(
             active_processes),
         current_system_monitor(system_monitor) {
         //Set up console output
-        console = spdlog::get("console");
-        if (!console) {
-            console = spdlog::stdout_color_mt("console");
-            std::shared_ptr<spdlog::sinks::stderr_color_sink_mt> sink = std::static_pointer_cast<
-                spdlog::sinks::stderr_color_sink_mt>(console->sinks()[0]);
-            sink->set_color(spdlog::level::info, sink->green);
-            console->set_pattern("%^%v%$");
-        }
+        console = commonLib::initializeLogger(active_logs);
     }
 
     void Display::render() {
-        renderHeader();
-        renderSystemMetrics();
-        renderProcessesList();
-        renderFooter();
+        //testing
+        init();
+        displayMetrics(2.4, 1.2);
+        cleanup();
     }
 
     void Display::renderSystemMetrics() const {
@@ -47,7 +44,7 @@ namespace myProc {
             current_system_monitor.total_processes());
     }
 
-    void Display::renderProcessesList() {
+    void Display::renderProcessesList() const {
         for (const Process &process: current_active_processes.get_processes_vector()) {
             long seconds = process.getElapsedSeconds(current_system_monitor.get_uptime());
             console->info(
@@ -70,5 +67,27 @@ namespace myProc {
 
     void Display::renderFooter() const {
         console->info("=================================\n\n");
+    }
+
+    void Display::cleanup() {
+        std::cout << "\033[?25h";  // Show cursor
+    }
+
+    void Display::init() {
+        // Clear screen, hide cursor
+        std::cout << "\033[2J\033[?25l";
+        std::cout.flush();
+    }
+
+    void Display::displayMetrics(float cpu, float mem) {
+        // Move to top, preserve logs below
+        std::cout << "\033[H";  // Home
+        std::cout << "CPU: " << cpu << "%\n";
+        std::cout << "Memory: " << mem << "%\n";
+        std::cout.flush();
+
+        // Logs appear below your metrics
+        console->info("Event occurred");
+        console->info("TEST");
     }
 }

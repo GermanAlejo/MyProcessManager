@@ -4,19 +4,19 @@
 
 #include <fstream>
 #include <spdlog/spdlog.h>
-#include<unistd.h>
+#include <unistd.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "../../include/common/common.h"
 #include "../../include/common/errors.h"
 
 using namespace std;
 
-namespace  myProc::commonLib {
-
+namespace myProc::commonLib {
     void waitSomeSeconds(const int seconds) {
         spdlog::info("Waiting for {} second...", seconds);
         constexpr unsigned int microsecond = 1000000;
-        usleep(seconds * microsecond);//sleeps for x seconds
+        usleep(seconds * microsecond); //sleeps for x seconds
     }
 
 
@@ -79,8 +79,8 @@ namespace  myProc::commonLib {
                 return "Dead";
             case state::K:
                 return "Wakekill";
-                //case state::w:
-                //    return "Waking";
+            //case state::w:
+            //    return "Waking";
             case state::P:
                 return "Parked";
             case state::I:
@@ -103,7 +103,7 @@ namespace  myProc::commonLib {
     }
 
     string getStatusPath(const string &pid) {
-        return string(procBase) + pid +string(statusPath);
+        return string(procBase) + pid + string(statusPath);
     }
 
     string getUptimePath() {
@@ -120,15 +120,14 @@ namespace  myProc::commonLib {
         string segment;
         vector<string> result;
 
-        while(getline(ss, segment, delimiter))
-        {
+        while (getline(ss, segment, delimiter)) {
             result.push_back(segment);
         }
         return result;
     }
 
     bool isNumber(const string &str) {
-        for (const char &c : str) {
+        for (const char &c: str) {
             if (isdigit(c) == 0) return false;
         }
         return true;
@@ -153,5 +152,21 @@ namespace  myProc::commonLib {
         return oss.str();
     }
 
-
+    std::shared_ptr<spdlog::logger> initializeLogger(const bool &activeLogger) {
+        //Set up console output
+        console = spdlog::get("console");
+        if (!console) {
+            console = spdlog::stdout_color_mt("console");
+            const std::shared_ptr<spdlog::sinks::stderr_color_sink_mt> sink = std::static_pointer_cast<
+                spdlog::sinks::stderr_color_sink_mt>(console->sinks()[0]);
+            sink->set_color(spdlog::level::info, sink->green);
+            sink->set_color(spdlog::level::err, sink->red);
+            sink->set_color(spdlog::level::warn, sink->yellow);
+            sink->set_color(spdlog::level::debug, sink->cyan);
+        }
+        if (!activeLogger) {
+            console->set_level(spdlog::level::off);
+        }
+        return console;
+    }
 }

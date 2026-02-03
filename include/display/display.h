@@ -17,7 +17,7 @@ namespace myProc {
         /**
          * Constructor, initializes the Monitor anc process container
          */
-        Display(SystemMonitor& system_monitor, ActiveProcesses& active_processes);
+        Display(SystemMonitor& system_monitor, ActiveProcesses& active_processes, const bool &active_logs);
 
         /**
          * Main render method to call in main
@@ -36,7 +36,7 @@ namespace myProc {
          */
         void renderSystemMetrics() const;
 
-        void renderProcessesList();
+        void renderProcessesList() const;
 
         /**
          * Outputs the Header of the manager
@@ -47,6 +47,12 @@ namespace myProc {
          * Outputs the footer of the Manager
          */
         void renderFooter() const;
+
+        void cleanup();
+
+        void init();
+
+        void displayMetrics(float cpu, float mem);
     };
 }
 

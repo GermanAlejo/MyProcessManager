@@ -14,8 +14,9 @@
 using namespace std;
 
 namespace myProc {
-    SystemMonitor::SystemMonitor() {
-        spdlog::info("Creating system monitor");
+    SystemMonitor::SystemMonitor(const bool &isLoggerActive) {
+        console = commonLib::initializeLogger(isLoggerActive);
+        console->info("Creating system monitor");
         readMemInfo();
         readUpTime();
         readStatFile();
@@ -23,15 +24,15 @@ namespace myProc {
 
     void SystemMonitor::readMemInfo() {
         try {
-            spdlog::info("Reading meminfo file");
+            console->info("Reading meminfo file");
             string memInfoFilePath = commonLib::getMemInfoPath();
             if (memInfoFilePath.empty() || !memInfoFilePath.starts_with('/')) {
-                spdlog::error("File path not valid");
+                console->error("File path not valid");
                 throw ProcessFileError("File path mem not valid");
             }
             ifstream memFile(memInfoFilePath);
             if (!memFile.is_open()) {
-                spdlog::error("File could not be opened");
+                console->error("File could not be opened");
                 throw ProcessFileError("Mem file cannot be opened");
             }
             unordered_map<string, string> memFileData = parseMemInfo(memFile);
@@ -51,22 +52,22 @@ namespace myProc {
 
             memFile.close();
         } catch (ProcessError &err) {
-            spdlog::error("Process error: {}", err.what());
+            console->error("Process error: {}", err.what());
             throw ProcessFileError("Error reading file in System monitor");
         }
     }
 
     void SystemMonitor::readStatFile() {
         try {
-            spdlog::info("Reading stat file");
+            console->info("Reading stat file");
             string statFilePath = commonLib::getStatPath();
             if (statFilePath.empty() || !statFilePath.starts_with('/')) {
-                spdlog::error("File path not valid");
+                console->error("File path not valid");
                 throw ProcessFileError("Stat file path not valid");
             }
             ifstream statFile(statFilePath);
             if (!statFile.is_open()) {
-                spdlog::error("File could not be opened");
+                console->error("File could not be opened");
                 throw ProcessFileError("Stat file cannot be opened");
             }
             //Parse file here
@@ -84,13 +85,13 @@ namespace myProc {
 
             statFile.close();
         } catch (ProcessError &err) {
-            spdlog::error("Process error: {}", err.what());
+            console->error("Process error: {}", err.what());
             throw ProcessFileError("Error reading file in System monitor");
         }
     }
 
     void SystemMonitor::readUpTime() {
-        spdlog::info("Reading uptime file");
+        console->info("Reading uptime file");
         unordered_map<string_view, uint64_t> uptimeDataMap = commonLib::getUptimeData();
         for (size_t i = 0; i < types::SYSTEM_FIELD_COUNT; ++i) {
             //fieldData with function meta
@@ -105,7 +106,7 @@ namespace myProc {
 
     //Save logic as status file
     unordered_map<string, string> SystemMonitor::parseMemInfo(ifstream &memFile) {
-        spdlog::info("Parsing meminfo file");
+        console->info("Parsing meminfo file");
         unordered_map<string, string> memDataMap;
         unordered_map<string, string> allValues;
         //loop all lines of the file
@@ -125,7 +126,7 @@ namespace myProc {
             const auto &fieldData = types::SYSTEM_FIELDS[i];
             //Check for empty value
             if (allValues[fieldData.name].empty()) {
-                spdlog::warn("Field system property: {} not found in meminfo file", fieldData.name);
+                console->warn("Field system property: {} not found in meminfo file", fieldData.name);
                 continue;
             }
             memDataMap[fieldData.name] = allValues[fieldData.name];
@@ -135,7 +136,7 @@ namespace myProc {
     }
 
     CpuSnapShot SystemMonitor::parseStatFile(ifstream &statFile) {
-        spdlog::info("Parsing stat file");
+        console->info("Parsing stat file");
         //clear EOF error flags
         statFile.clear();
         //move read pointer to start of file
@@ -143,7 +144,7 @@ namespace myProc {
         string line;
         getline(statFile, line);
         if (line.empty()) {
-            spdlog::error("Empty line provided");
+            console->error("Empty line provided");
             throw ProcessReadError("Empty line read in file");
         }
 
@@ -158,7 +159,7 @@ namespace myProc {
             const auto &fieldData = types::CPU_FIELDS[i];
             //check for cpu value and skip
             if (fieldData.name == "cpu") {
-                spdlog::warn("Skipping cpu string value");
+                console->warn("Skipping cpu string value");
                 continue;
             }
             cpuMap[fieldData.name] = allValues[fieldData.pos];
@@ -170,7 +171,7 @@ namespace myProc {
     }
 
     void SystemMonitor::calculateRamFinalValues() {
-        spdlog::info("Calculate RAM usage percentage");
+        console->info("Calculate RAM usage percentage");
         const unsigned long ramUsage = total_ram() - available_ram();
         const double finalRam = static_cast<double>(ramUsage) / static_cast<double>(total_ram());
         //Used ram does not work (expects a long not a double)
@@ -184,7 +185,7 @@ namespace myProc {
     }
 
     void SystemMonitor::calculateTotalCPU(const CpuSnapShot &newSnapShot) {
-        spdlog::info("Calculating CPU usage");
+        console->info("Calculating CPU usage");
         //Subtract previous from current ones
         const unsigned long prevIdle = lastCpuRead->idle + lastCpuRead->iowait;
         const unsigned long idle = newSnapShot.idle + newSnapShot.iowait;
@@ -204,7 +205,7 @@ namespace myProc {
         // Calculate percentage
         double cpu_percentage = (totald - idled) / totald;
         if (cpu_percentage < 0) {
-            spdlog::warn("CPU usage is 0 - Error calculating usage");
+            console->warn("CPU usage is 0 - Error calculating usage");
             cpu_percentage = 0.;
         }
         cpu_percentage *= 100;
@@ -213,7 +214,7 @@ namespace myProc {
 
 
     void SystemMonitor::refresh() {
-        spdlog::info("Refreshing System Monitor");
+        console->info("Refreshing System Monitor");
         readMemInfo();
         readUpTime();
         readStatFile();

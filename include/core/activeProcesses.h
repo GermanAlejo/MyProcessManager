@@ -17,13 +17,16 @@ namespace myProc {
         std::vector<Process> processesVector;
         uint64_t systemUpTime;
 
+        //Logger
+        std::shared_ptr<spdlog::logger> console;
+
         //TODO: Ensure the vector is ordered
         //TODO: Make function to order vector by Memory usage
 
         static bool isKernelProcess(const std::string& pid);
         void readProcDir();
     public:
-        explicit ActiveProcesses(const uint64_t &totalUpTime);
+        explicit ActiveProcesses(const uint64_t &totalUpTime, const bool &isLoggerActive);
 
         void refresh();
         void printProcessContainer() const;

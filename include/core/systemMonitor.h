@@ -17,11 +17,10 @@
 namespace myProc {
 
     class SystemMonitor {
-        /**
-         *  Calculate values in numeric and later in printing get string in %
-         *
-         */
     private:
+        //logger
+        std::shared_ptr<spdlog::logger> console;
+
         int totalProcesses{};
         //values that can be read
         unsigned long totalRam{}; //in kB
@@ -46,7 +45,7 @@ namespace myProc {
          * @param memFile
          * @return std::unordered_map<std::string, std::string>
          */
-        static std::unordered_map<std::string, std::string> parseMemInfo(std::ifstream &memFile);
+        std::unordered_map<std::string, std::string> parseMemInfo(std::ifstream &memFile);
 
         /**
          * function to read the proc/stat file and save the cpu info from the file
@@ -58,7 +57,7 @@ namespace myProc {
          * @param statFile
          * @return CpuSnapShot
          */
-        static CpuSnapShot parseStatFile(std::ifstream &statFile);
+        CpuSnapShot parseStatFile(std::ifstream &statFile);
 
         /**
          * function to read the proc/uptime and save the time usage info from the file
@@ -77,7 +76,7 @@ namespace myProc {
         void calculateRamFinalValues();
 
     public:
-        SystemMonitor();
+        SystemMonitor(const bool &isLoggerActive);
 
         /**
          *

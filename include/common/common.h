@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <vector>
 #include <cstdint>
+#include <memory>
+#include <spdlog/spdlog.h>
 
 namespace myProc::commonLib {
     inline constexpr char processPath[] = "/proc/*/stat";
@@ -23,7 +25,8 @@ namespace myProc::commonLib {
     inline constexpr char processPathStatus[] = "/proc/*/status";
     inline constexpr std::string_view processFinderChar = "/*";
     inline constexpr std::string_view TOTAL_TIME_KEY = "totalTime"; //return as uint64_t
-    inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime"; //return as uint64_t
+    inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime"; //return as uint64_t//Logger
+    inline std::shared_ptr<spdlog::logger> console;
 
     std::unordered_map<std::string_view, std::uint64_t> getUptimeData();
 
@@ -48,7 +51,7 @@ namespace myProc::commonLib {
     /**
      * Function to wait one second so we can compare system snapshots
      */
-    void waitSomeSeconds(const int seconds);
+    void waitSomeSeconds(int seconds);
 
     std::string getUptimePath();
 
@@ -79,6 +82,8 @@ namespace myProc::commonLib {
      * @return
      */
     std::string cleanZerosFromString(double value);
+
+    std::shared_ptr<spdlog::logger> initializeLogger(const bool &activeLogger);
 }
 
 #endif //MYPROCESSMANAGER_COMMON_H
