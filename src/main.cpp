@@ -24,39 +24,62 @@ void signal_handler(const int signal) {
     }
 }
 
-int main(int argc, char *argv[]) {
+/**
+ * Method to read input args for the program
+ * @param argc number of params
+ * @param argv array with params
+ * @param value var to store waiting time between ticks
+ * @param active flag to control logs outputs
+ */
+void read_args(int &argc, char *argv[], int &value, bool &active) {
+    for (int i = 1; i < argc; ++i) {
+        if (std::string arg = argv[i]; arg == "--interval") {
+            const auto input = argv[++i];
+            if (input == nullptr) {
+                console->error("Invalid Input");
+                throw std::invalid_argument("Missing value for argument: " + arg);
+            }
+            value = std::stoi(input);
+        } else if (arg == "--verbose") {
+            active = true;
+        }
+    }
+}
 
+int main(int argc, char *argv[]) {
     //Register termination signals
     std::signal(SIGTERM, signal_handler); //ctr + c
     std::signal(SIGINT, signal_handler); //termination request
 
     constexpr int MAX_INTERVAL = 60000;
     constexpr int MIN_INTERVAL = 1000;
-    int value;
-    bool active;
 
-    //TODO: Make the boolean a command line parameter
-    if (argc < 2) {
-        console->info("Setting default intervals");
-        value = 1000; //1s
-        active = true; //set to true by default
-    } else {
+    console->info("Setting default intervals");
+    int value = 1000; //1s
+    bool active = false; //set to false by default
+
+    if (argc > 1) {
         try {
+            read_args(argc, argv, value, active);
             console->info("Intervals provided: {}", value);
-            value = std::stoi(argv[1]);
             if (value > MAX_INTERVAL || value < MIN_INTERVAL)
                 throw std::out_of_range(
                     "Error - number out of range max interval allowed: 60000 (1 minute) min interval allowed: 1000 (1 second)");
         } catch (std::invalid_argument const &ex) {
             console->error(ex.what());
             console->error("Error - Invalid input provided");
-            console->info("Usage: MyProcessManager [INTERVAL_IN_SECONDS]");
+            console->info("Usage: MyProcessManager --interval [INTERVAL_IN_SECONDS] --verbose");
             return EXIT_FAILURE;
         } catch (std::out_of_range const &ex) {
             console->error(ex.what());
             return EXIT_FAILURE;
+        } catch (std::logic_error const &ex) {
+            console->error(ex.what());
+            console->info("Usage: MyProcessManager --interval [INTERVAL_IN_SECONDS] --verbose");
+            return EXIT_FAILURE;
         }
     }
+
     const int REFRESH_INTERVALS_MS = value;
     const bool isLoggerActive = active;
 
