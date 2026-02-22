@@ -27,7 +27,9 @@ namespace myProc {
     void Display::render() {
         init();
         renderHeader();
-        displayMetrics();
+        displayGlobalMetrics();
+        displayProcessMetricsHeader();
+        //displayProcessMetrics();
         renderFooter();
     }
 
@@ -37,7 +39,7 @@ namespace myProc {
         string msg;
         string header;
         string title = " My Process Manager - " + today_str + " ";
-        const int toFill = (terminalCoordinates.second -  title.length()) / 2;
+        const int toFill = (terminalCoordinates.second - title.length()) / 2;
         for (int i = 0; i < toFill; ++i) {
             msg += "=";
         }
@@ -51,13 +53,12 @@ namespace myProc {
         for (int i = 0; i < terminalCoordinates.second; ++i) {
             footer += "=";
         }
-        writeToTerminal("\n" + to_string(terminalCoordinates.first) + " " +  to_string(terminalCoordinates.second));
         writeToTerminal(
             string(
                 ANSI::Positioning::moveCursorToRow(
                     terminalCoordinates.first,
                     terminalCoordinates.second
-                    )) +
+                )) +
             footer +
             string(ANSI::Positioning::RESET)
         );
@@ -71,26 +72,52 @@ namespace myProc {
 
     void Display::init() const {
         // Clear screen, hide cursor
-        writeToTerminal(string(ANSI::Positioning::CLEAR_SCROLL_BACK_BUFF) + string(ANSI::Positioning::HOME) + string(ANSI::Positioning::CLEAR));
+        writeToTerminal(
+            string(ANSI::Positioning::CLEAR_SCROLL_BACK_BUFF) + string(ANSI::Positioning::HOME) + string(
+                ANSI::Positioning::CLEAR));
     }
 
-    /*
-     *
-    === MyProcessManager ===
-        CPU: 23.5% | Memory Total: 16.0 GiB | Memory Used: 8.2 GiB | Memory Free: 7.8 GiB | Uptime: 45d 12h 34m
-        Processes: total | Total User: 127 | Total Kernel: 89
-        <spaace>
-        PID | Name | State | Virtual Memory | Resident Memory | Time Running
+    void Display::displayGlobalMetrics() const {
+        const long seconds = current_system_monitor.get_uptime();
+        const string header = format("CPU: {:.2f}% | Total Memory: {:.2f}GiB | Memory Used: {:.2f}GiB | "
+                                     "Free Memory {:.2f}GiB | Uptime: {}h {}m {}s  | Number of Processes: {}",
+                                     current_system_monitor.total_cpu(),
+                                     current_system_monitor.total_ram_gib(),
+                                     current_system_monitor.used_ram_gib(),
+                                     current_system_monitor.available_ram_gib(),
+                                     seconds / 3600,
+                                     (seconds % 3600) / 60,
+                                     seconds % 60,
+                                     current_system_monitor.total_processes());
+        const string msg = ANSI::buildAnsiCodes(ANSI::Color::BLUE, nullopt, ANSI::Style::UNDERLINE) +
+                           header + string(ANSI::Positioning::RESET);
+        writeToTerminal("\n");
+        writeToTerminal(msg);
+    }
 
-     *
-     */
+    void Display::displayProcessMetricsHeader() const {
+        const string header = format("PID | Name | State | CPU | Resident Memory | Time Running");
+        const string msg = ANSI::buildAnsiCodes(ANSI::Color::WHITE, nullopt, ANSI::Style::DIM) +
+                           header + string(ANSI::Positioning::RESET);
+        writeToTerminal("\n");
+        writeToTerminal(msg);
+    }
 
-    void Display::displayMetrics() {
-        // Move to top, preserve logs below
-        string s = string(ANSI::Positioning::moveCursorToRow(5, 0)) + ANSI::buildAnsiCodes(
-                       ANSI::Color::RED, ANSI::BackgroundColor::BLUE, ANSI::Style::BOLD)
-                   + "TEST" + string(ANSI::Positioning::RESET);
-        writeToTerminal(s);
+    void Display::displayProcessMetrics() const {
+        for (const Process &process: current_active_processes.get_processes_vector()) {
+            const long seconds = process.getElapsedSeconds(current_system_monitor.get_uptime());
+            string procesStr = process.getPid() + process.getName() + process.getState() +
+                               format("{:.2f}", process.get_cpu_usage()) +
+                               commonLib::displayMemory(process.vm_rss_mib()) +
+                               format("{}h {}m {}s",
+                                      seconds / 3600,
+                                      (seconds % 3600) / 60,
+                                      seconds % 60);
+            string msg = ANSI::buildAnsiCodes(ANSI::Color::WHITE, nullopt, nullopt) +
+                procesStr + string(ANSI::Positioning::RESET);
+            writeToTerminal("\n");
+            writeToTerminal(msg);
+        }
     }
 
     int Display::openTerminal() const {
@@ -107,7 +134,7 @@ namespace myProc {
         fsync(this->tty); //force flush
     }
 
-    std::pair<int,int> Display::getEndTerminal() const {
+    std::pair<int, int> Display::getEndTerminal() const {
         if (tty < 0 || !isatty(tty)) {
             throw DisplayOutputError("TTY invalid");
         }

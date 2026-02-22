@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
             //sleep for a while
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         } catch (const std::exception &e) {
-            std::cerr << "Error during refresh: " << e.what() << "\n";
+            console->error("Error during refresh: {}", e.what());
         }
     }
 

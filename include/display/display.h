@@ -183,7 +183,11 @@ namespace myProc {
 
         void init() const;
 
-        void displayMetrics();
+        void displayGlobalMetrics() const;
+
+        void displayProcessMetricsHeader() const;
+
+        void displayProcessMetrics() const;
 
         int openTerminal() const;
 
