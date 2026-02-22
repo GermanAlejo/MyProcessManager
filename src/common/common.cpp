@@ -13,38 +13,38 @@
 using namespace std;
 
 namespace myProc::commonLib {
-    void waitSomeSeconds(const int seconds) {
-        spdlog::info("Waiting for {} second...", seconds);
+    void waitSomeSeconds(const int seconds, const std::shared_ptr<spdlog::logger>& logger) {
+        logger->info("Waiting for {} second...", seconds);
         constexpr unsigned int microsecond = 1000000;
         usleep(seconds * microsecond); //sleeps for x seconds
     }
 
 
-    unordered_map<string_view, uint64_t> getUptimeData() {
-        spdlog::info("Reading uptime file");
+    unordered_map<string_view, uint64_t> getUptimeData(const std::shared_ptr<spdlog::logger>& logger) {
+        logger->info("Reading uptime file");
         const string path = getUptimePath();
         //check errors
         if (path.empty() || !path.starts_with('/')) {
-            spdlog::error("File path not found!");
+            logger->error("File path not found!");
             throw ProcessFileError("File path not correct");
         }
 
         ifstream uptimeFile(path);
         string line;
         if (!uptimeFile.is_open()) {
-            spdlog::error("File found - but could not be open");
+            logger->error("File found - but could not be open");
             throw ProcessFileError("Error opening file");
         }
 
         //get line and loop with spaces
         getline(uptimeFile, line);
-        return parseUptimeFile(line);
+        return parseUptimeFile(line, logger);
     }
 
-    unordered_map<string_view, uint64_t> parseUptimeFile(const string &line) {
-        spdlog::info("Parsing uptime file");
+    unordered_map<string_view, uint64_t> parseUptimeFile(const string &line, const std::shared_ptr<spdlog::logger>& logger) {
+        logger->info("Parsing uptime file");
         if (line.empty()) {
-            spdlog::error("Empty line provided");
+            logger->error("Empty line provided");
             throw ProcessReadError("Empty line");
         }
 

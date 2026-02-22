@@ -14,8 +14,9 @@ using namespace std;
 
 namespace myProc {
     //Constructors
-    Process::Process(const string &processName, const uint64_t systemUpTime) {
-        spdlog::info("Creating new process with pid: {}", processName);
+    Process::Process(const string &processName, const uint64_t systemUpTime, const std::shared_ptr<spdlog::logger>& logger) {
+        this->console = logger;
+        console->info("Creating new process with pid: {}", processName);
         readStatFile(processName);
         readStatusFile(processName);
         calculateMemory();
@@ -25,19 +26,19 @@ namespace myProc {
     //Private methods
     void Process::readStatFile(const string &processNumber) {
         try {
-            spdlog::info("Reading stat file");
+            console->info("Reading stat file");
             //Check error
             string statFile = commonLib::getStatPath(processNumber);
             //check errors
             if (statFile.empty() || !statFile.starts_with('/')) {
-                spdlog::error("File path not found!");
+                console->error("File path not found!");
                 throw ProcessFileError("File path not correct");
             }
 
             ifstream pidFile(statFile);
             string line;
             if (!pidFile.is_open()) {
-                spdlog::error("File found - but could not be open");
+                console->error("File found - but could not be open");
                 throw ProcessFileError("Error opening file");
             }
             //get line and loop with spaces
@@ -55,23 +56,23 @@ namespace myProc {
             }
             pidFile.close();
         } catch (ProcessError &e) {
-            spdlog::error("Process error: {}", e.what());
+            console->error("Process error: {}", e.what());
             throw ProcessError("Process error"); //TODO: maybe this should be change to capture all possiblea exceptions
         }
     }
 
     void Process::readStatusFile(const string &processNumber) {
         try {
-            spdlog::info("Reading status file");
+            console->info("Reading status file");
             string statusFile = commonLib::getStatusPath(processNumber);
             //check errors
             if (statusFile.empty() || !statusFile.starts_with('/')) {
-                spdlog::error("File path not found!");
+                console->error("File path not found!");
                 throw ProcessFileError("File path not correct");
             }
             ifstream pidStatusFile(statusFile);
             if (!pidStatusFile.is_open()) {
-                spdlog::error("File found - but could not be open");
+                console->error("File found - but could not be open");
                 throw ProcessFileError("Error opening file");
             }
             unordered_map<string, string> statusMap = parseStatusFile(pidStatusFile);
@@ -89,15 +90,15 @@ namespace myProc {
 
             pidStatusFile.close();
         } catch (ProcessError &e) {
-            spdlog::error("Process error: {}", e.what());
+            console->error("Process error: {}", e.what());
             throw ProcessError("Process error"); //TODO: maybe this should be change to capture all possiblea exceptions
         }
     }
 
     unordered_map<string, string> Process::parseStatFile(const string &fileLine) {
-        spdlog::info("Parsing stat file");
+        console->info("Parsing stat file");
         if (fileLine.empty()) {
-            spdlog::error("Empty line provided");
+            console->error("Empty line provided");
             throw ProcessReadError("Empty line");
         }
 
@@ -117,7 +118,7 @@ namespace myProc {
     }
 
     unordered_map<string, string> Process::parseStatusFile(ifstream &file) {
-        spdlog::info("Parsing status file");
+        console->info("Parsing status file");
         unordered_map<string, string> allValues;
         unordered_map<string, string> statusData;
         //loop all lines of file
@@ -126,7 +127,7 @@ namespace myProc {
             vector<string> lineValues = commonLib::splitStringByChar(line, '\t');
             //some values from status file are in several columns, ignore those for the moment
             if (lineValues.size() != 2) {
-                spdlog::debug("Skipping line - multiple values!");
+                console->debug("Skipping line - multiple values!");
                 continue;
             }
             //remove ':' from name values
@@ -138,7 +139,7 @@ namespace myProc {
             const auto &fieldData = types::COLUM_FIELDS[i];
             //if empty we didn't find the parameters we were looking for
             if (allValues[fieldData.name].empty()) {
-                spdlog::warn("Field status property: {} not found in status field", fieldData.name);
+                console->warn("Field status property: {} not found in status field", fieldData.name);
                 continue;
             }
             statusData[fieldData.name] = allValues[fieldData.name];
@@ -148,16 +149,21 @@ namespace myProc {
 
     //public methods
     void Process::refresh(const uint64_t &systemUpTime) {
-        spdlog::info("REFRESHING - {}", pid);
-        readStatFile(pid);
-        readStatusFile(pid);
-        calculateCPU(systemUpTime);
-        calculateMemory();
+        try {
+            console->info("REFRESHING - {}", pid);
+            readStatFile(pid);
+            readStatusFile(pid);
+            calculateCPU(systemUpTime);
+            calculateMemory();
+        } catch (ProcessError &err) {
+            console->error("Error refreshing");
+            throw ProcessResourcesError(err.what());
+        }
     }
 
     void Process::calculateCPU(const uint64_t &systemUpTime) {
         //TODO: Implement error catching here
-        spdlog::info("Calculating CPU usage for: {}", getPid());
+        console->info("Calculating CPU usage for: {}", getPid());
         const long ticks = sysconf(_SC_CLK_TCK); //Clock ticks per second (usually 100 on Linux)
         const long totalTime = getUtime() + getsTime(); //total process time
         //Convert process total time to seconds
@@ -168,14 +174,14 @@ namespace myProc {
         const int numCores = sysconf(_SC_NPROCESSORS_ONLN);
         double cpuUsage = (seconds / processUpTime) / numCores * 100;
         if (cpuUsage < 0) {
-            spdlog::warn("CPU usage is 0 - Error calculating usage");
+            console->warn("CPU usage is 0 - Error calculating usage");
             cpuUsage = 0.;
         }
         set_cpu_usage(cpuUsage);
     }
 
     void Process::calculateMemory() {
-        spdlog::info("Calculating MiB memory usage");
+        console->info("Calculating MiB memory usage");
         set_vm_rss_mib(static_cast<double>(getVmRSS()) / 1024);
         set_vm_size_mib(static_cast<double>(getVmSize()) / 1024);
     }

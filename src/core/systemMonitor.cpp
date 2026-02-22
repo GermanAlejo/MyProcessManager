@@ -75,7 +75,7 @@ namespace myProc {
                 this->lastCpuRead = parseStatFile(statFile);
             }
             //Wait 1 sec
-            commonLib::waitSomeSeconds(1);
+            commonLib::waitSomeSeconds(1, console);
 
             //Read file second time
             CpuSnapShot new_snap_shot = parseStatFile(statFile);
@@ -92,7 +92,7 @@ namespace myProc {
 
     void SystemMonitor::readUpTime() {
         console->info("Reading uptime file");
-        unordered_map<string_view, uint64_t> uptimeDataMap = commonLib::getUptimeData();
+        unordered_map<string_view, uint64_t> uptimeDataMap = commonLib::getUptimeData(console);
         for (size_t i = 0; i < types::SYSTEM_FIELD_COUNT; ++i) {
             //fieldData with function meta
             const auto &meta = types::SYSTEM_FIELDS[i];

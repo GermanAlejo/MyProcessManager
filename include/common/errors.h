@@ -35,4 +35,14 @@ public:
     explicit ProcessReadError(const std::string& msg);
 };
 
+class ProcessResourcesError : public ProcessError {
+public:
+    explicit  ProcessResourcesError(const std::string& msg);
+};
+
+class DisplayOutputError : public ProcessError {
+public:
+    explicit DisplayOutputError(const std::string& msg);
+};
+
 #endif //MYPROCESSMANAGER_ERRORS_H

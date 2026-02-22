@@ -20,3 +20,9 @@ ProcessAccessDenied::ProcessAccessDenied(const string& msg)
 
 ProcessReadError::ProcessReadError(const string& msg)
     : ProcessError(msg) {}
+
+ProcessResourcesError::ProcessResourcesError(const std::string &msg)
+    : ProcessError(msg) {}
+
+DisplayOutputError::DisplayOutputError(const std::string &msg)
+    : ProcessError(msg) {}

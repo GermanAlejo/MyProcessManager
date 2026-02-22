@@ -25,17 +25,19 @@ namespace myProc {
         std::string VmSize; //virtual memory
         double VmSizeGiB;
         double cpu_usage;
+        //Logger
+        std::shared_ptr<spdlog::logger> console;
 
         void readStatFile(const std::string &processNumber);
 
-        static std::unordered_map<std::string, std::string> parseStatFile(const std::string &fileLine);
+        std::unordered_map<std::string, std::string> parseStatFile(const std::string &fileLine);
 
         void readStatusFile(const std::string &processNumber);
 
-        static std::unordered_map<std::string, std::string> parseStatusFile(std::ifstream &file);
+        std::unordered_map<std::string, std::string> parseStatusFile(std::ifstream &file);
 
     public:
-        Process(const std::string &processName, const uint64_t systemUpTime);
+        Process(const std::string &processName, const uint64_t systemUpTime, const std::shared_ptr<spdlog::logger>& logger);
 
         //call this function each x seconds to refresh process data
         void refresh(const uint64_t &systemUpTime);

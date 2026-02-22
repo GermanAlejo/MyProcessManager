@@ -56,7 +56,7 @@ namespace myProc {
                     console->warn("Skipping kernel process with name: {}", processName);
                     continue;
                 }
-                Process newProcess(processName, systemUpTime);
+                Process newProcess(processName, systemUpTime, console);
                 processesVector.push_back(newProcess);
             }
         } catch (ProcessError &err) {

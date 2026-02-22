@@ -97,10 +97,15 @@ int main(int argc, char *argv[]) {
             monitor->refresh();
             active_processes->refresh();
             display.render();
+            //sleep for a while
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         } catch (const std::exception &e) {
             std::cerr << "Error during refresh: " << e.what() << "\n";
         }
     }
+
+    //Clear the display/terminal
+    display.cleanup();
 
     return EXIT_SUCCESS;
 }

@@ -23,14 +23,16 @@ namespace myProc::commonLib {
     inline constexpr char uptimePath[] = "uptime"; //does not depent of a process so remove /
     inline constexpr char memInfoPath[] = "meminfo";
     inline constexpr char processPathStatus[] = "/proc/*/status";
+    inline constexpr char terminalAliasPath[] = "/dev/tty";
     inline constexpr std::string_view processFinderChar = "/*";
     inline constexpr std::string_view TOTAL_TIME_KEY = "totalTime"; //return as uint64_t
-    inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime"; //return as uint64_t//Logger
+    inline constexpr std::string_view TOTAL_IDLE_KEY = "idleTime"; //return as uint64_t
+    //Logger
     inline std::shared_ptr<spdlog::logger> console;
 
-    std::unordered_map<std::string_view, std::uint64_t> getUptimeData();
+    std::unordered_map<std::string_view, std::uint64_t> getUptimeData(const std::shared_ptr<spdlog::logger>& logger);
 
-    std::unordered_map<std::string_view, std::uint64_t> parseUptimeFile(const std::string &line);
+    std::unordered_map<std::string_view, std::uint64_t> parseUptimeFile(const std::string &line, const std::shared_ptr<spdlog::logger>& logger);
 
     enum state {
         R = 'R', //Running
@@ -51,7 +53,7 @@ namespace myProc::commonLib {
     /**
      * Function to wait one second so we can compare system snapshots
      */
-    void waitSomeSeconds(int seconds);
+    void waitSomeSeconds(int seconds, const std::shared_ptr<spdlog::logger>& logger);
 
     std::string getUptimePath();
 
