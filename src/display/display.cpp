@@ -33,13 +33,17 @@ namespace myProc {
 
     void Display::renderHeader() const {
         auto today = std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now());
-        string today_str = format("{:%d-%m-%Y}", today);
-        string msg = "======================== My Process Manager - " + today_str + " ========================";
+        const string today_str = format("{:%d-%m-%Y}", today);
+        string msg;
         string header;
         string title = " My Process Manager - " + today_str + " ";
-        //for ()
+        const int toFill = (terminalCoordinates.second -  title.length()) / 2;
+        for (int i = 0; i < toFill; ++i) {
+            msg += "=";
+        }
+        header = msg + title + msg;
         writeToTerminal(string(ANSI::Positioning::HOME));
-        writeToTerminal(msg);
+        writeToTerminal(header);
     }
 
     void Display::renderFooter() const {
