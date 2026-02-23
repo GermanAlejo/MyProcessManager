@@ -223,7 +223,7 @@ namespace myProc {
     [[nodiscard]] int SystemMonitor::total_processes() const {
         return totalProcesses;
     }
-
+    //TODO: This is not being set currently
     void SystemMonitor::set_total_processes(const int total_processes) {
         totalProcesses = total_processes;
     }

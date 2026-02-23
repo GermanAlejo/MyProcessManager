@@ -7,13 +7,9 @@
 
 #include <memory>
 #include <spdlog/spdlog.h>
-#include <iostream>
 #include <termios.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
 
-#include "common/common.h"
 #include "common/errors.h"
 #include "core/activeProcesses.h"
 #include "core/systemMonitor.h"
@@ -163,6 +159,7 @@ namespace myProc {
         //Terminal file descriptor
         int tty;
         std::pair<int, int> terminalCoordinates;
+        static constexpr int MAX_CELL_SIZE = 25;
 
         /**
          * Outputs the Global system metrics
@@ -189,11 +186,11 @@ namespace myProc {
 
         void displayProcessMetrics() const;
 
-        int openTerminal() const;
+        [[nodiscard]] int openTerminal() const;
 
         void writeToTerminal(std::string_view msg) const;
 
-        std::pair<int,int> getEndTerminal() const;
+        [[nodiscard]] std::pair<int,int> getEndTerminal() const;
 
     };
 }
